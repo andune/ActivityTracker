@@ -1,0 +1,4 @@
+name: ActivityTracker
+main: org.morganm.activitytracker.ActivityTracker
+version: 0.1
+author: morganm
