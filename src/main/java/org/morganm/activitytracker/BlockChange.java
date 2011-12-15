@@ -16,6 +16,9 @@ public class BlockChange {
 	// should only be BLOCK_PLACE or BLOCK_BREAK
 	public Event.Type eventType;
 	
+	public String playerName;
+	public long time;		// time of the event
+	
 	public World world;
 	public int x;
 	public int y;
@@ -23,4 +26,8 @@ public class BlockChange {
 	
 	public Material type;
 	public byte data;
+	
+	public String locationString() {
+		return "{"+world.getName()+",x="+x+",y="+y+",z="+z+"}";
+	}
 }

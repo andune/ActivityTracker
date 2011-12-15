@@ -11,9 +11,11 @@ package org.morganm.activitytracker;
 public class Log {
 	private ActivityTracker plugin;
 	private boolean isInitialized;
+	private String playerName;
 	
-	public Log(ActivityTracker plugin) {
+	public Log(ActivityTracker plugin, String playerName) {
 		this.plugin = plugin;
+		this.playerName = playerName;
 	}
 	
 	public void init() {
@@ -24,12 +26,15 @@ public class Log {
 		// TODO
 	}
 	
-	public void logMessage(String message) {
+	public void logMessage(long msgTime, String message) {
 		if( !isInitialized ) {
 			// TODO: log some error
 			return;
 		}
 		
 		// TODO: write me
+	}
+	public void logMessage(String message) {
+		logMessage(System.currentTimeMillis(), message);
 	}
 }

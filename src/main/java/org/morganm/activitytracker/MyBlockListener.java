@@ -18,13 +18,16 @@ public class MyBlockListener extends BlockListener {
 	
 	public MyBlockListener(ActivityTracker plugin) {
 		this.plugin = plugin;
+		this.tracker = this.plugin.getBlockTracker();
 	}
 	
 	@Override
 	public void onBlockBreak(BlockBreakEvent event) {
 		Block b = event.getBlock();
 		BlockChange bc = tracker.getEndObject();
-		
+
+		bc.playerName = event.getPlayer().getName();
+		bc.time = System.currentTimeMillis();
 	    bc.eventType = event.getType();
 		bc.x = b.getX();
 		bc.y = b.getY();
@@ -39,6 +42,8 @@ public class MyBlockListener extends BlockListener {
 		Block b = event.getBlock();
 		BlockChange bc = tracker.getEndObject();
 		
+		bc.playerName = event.getPlayer().getName();
+		bc.time = System.currentTimeMillis();
 	    bc.eventType = event.getType();
 		bc.x = b.getX();
 		bc.y = b.getY();

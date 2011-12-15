@@ -15,14 +15,16 @@ import org.bukkit.plugin.java.JavaPlugin;
  *
  */
 public class ActivityTracker extends JavaPlugin {
-	private static final Logger log = Logger.getLogger(ActivityTracker.class.toString());
-	private static final String logPrefix = "[ActivityLogger] ";
+	public static final Logger log = Logger.getLogger(ActivityTracker.class.toString());
+	public static final String logPrefix = "[ActivityLogger] ";
 
 	private String version;
 	private TrackerManager trackerManager;
 	private LogManager logManager;
+	private BlockTracker blockTracker;
 	private MyBlockListener blockListener;
 	private MyPlayerListener playerListener;
+	private MyEntityListener entityListener;
 	
 	@Override
 	public void onEnable() {
@@ -30,6 +32,7 @@ public class ActivityTracker extends JavaPlugin {
 		
 		trackerManager = new TrackerManager(this);
 		logManager = new LogManager(this);
+		blockTracker = new BlockTracker(this);
 		
 		PluginManager pm = getServer().getPluginManager();
 		blockListener = new MyBlockListener(this);
@@ -51,10 +54,15 @@ public class ActivityTracker extends JavaPlugin {
 		pm.registerEvent(Type.PLAYER_KICK, playerListener, Priority.Monitor, this);
 		pm.registerEvent(Type.PLAYER_RESPAWN, playerListener, Priority.Monitor, this);
 		pm.registerEvent(Type.PLAYER_TELEPORT, playerListener, Priority.Monitor, this);
-		pm.registerEvent(Type.PLAYER_ITEM_HELD, playerListener, Priority.Monitor, this);
 		
-		getServer().getScheduler().scheduleAsyncRepeatingTask(this, new MovementTracker(this), 200, 200);
-		getServer().getScheduler().scheduleAsyncRepeatingTask(this, new BlockLogger(this), 100, 100);
+		// event type exists, but no Bukkit method call exists for this event yet
+//		pm.registerEvent(Type.PLAYER_ITEM_HELD, playerListener, Priority.Monitor, this);
+		
+		entityListener = new MyEntityListener(this);
+		pm.registerEvent(Type.ENTITY_DEATH, entityListener, Priority.Monitor, this);
+		
+		getServer().getScheduler().scheduleAsyncRepeatingTask(this, new MovementTracker(this), 100, 100);	// every 5 seconds
+		getServer().getScheduler().scheduleAsyncRepeatingTask(this, new BlockLogger(this), 100, 100);		// every 5 seconds
 		
 		log.info(logPrefix + "version "+version+" is enabled");
 	}
@@ -66,4 +74,5 @@ public class ActivityTracker extends JavaPlugin {
 
 	public TrackerManager getTrackerManager() { return trackerManager; }
 	public LogManager getLogManager() { return logManager; }
+	public BlockTracker getBlockTracker() { return blockTracker; }
 }

@@ -7,8 +7,6 @@ package org.morganm.activitytracker;
 /** Internally implements a circular buffer that reuses existing objects to avoid
  * any performance penalties related to object creation & GC.
  * 
- * TODO: known threading issues at the moment, consider how to add low-overhead synchronization
- * 
  * @author morganm
  *
  */
