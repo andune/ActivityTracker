@@ -1,7 +1,9 @@
 /**
  * 
  */
-package org.morganm.activitytracker;
+package org.morganm.activitytracker.block;
+
+import org.morganm.activitytracker.ActivityTracker;
 
 
 /** Internally implements a circular buffer that reuses existing objects to avoid

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.morganm.activitytracker;
+package org.morganm.activitytracker.util;
 
 import java.util.logging.Logger;
 
@@ -21,7 +21,9 @@ import com.sk89q.wepif.PermissionsResolverManager;
  * @author morganm
  *
  */
-public class PermissionWrapper {
+public class PermissionSystem {
+	private static PermissionSystem instance;
+	
 	private final JavaPlugin plugin;
 	private final Logger log;
 	private final String logPrefix;
@@ -30,17 +32,28 @@ public class PermissionWrapper {
     private PermissionsResolverManager wepifPerms = null;
     private PermissionHandler perm2Handler;
 	
-	public PermissionWrapper(JavaPlugin plugin, Logger log, String logPrefix) {
+	public PermissionSystem(JavaPlugin plugin, Logger log, String logPrefix) {
 		this.plugin = plugin;
 		if( log != null )
 			this.log = log;
 		else
-			this.log = Logger.getLogger(PermissionWrapper.class.toString());
+			this.log = Logger.getLogger(PermissionSystem.class.toString());
 		
 		if( logPrefix != null )
 			this.logPrefix = logPrefix;
 		else
-			this.logPrefix = "["+plugin.getDescription().getName()+"] "; 
+			this.logPrefix = "["+plugin.getDescription().getName()+"] ";
+		
+		instance = this;
+	}
+	
+	/** **WARNING** Not your typical singleton pattern, this CAN BE NULL. An instance
+	 * must be created by the plugin before this will return a value.
+	 * 
+	 * @return
+	 */
+	public static PermissionSystem getInstance() {
+		return instance;
 	}
 	
 	public void setupPermissions() {

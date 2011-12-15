@@ -1,13 +1,16 @@
 /**
  * 
  */
-package org.morganm.activitytracker;
+package org.morganm.activitytracker.block;
 
 import java.util.logging.Logger;
 
 import org.bukkit.Location;
 import org.bukkit.event.Event.Type;
 import org.bukkit.plugin.Plugin;
+import org.morganm.activitytracker.ActivityTracker;
+import org.morganm.activitytracker.Log;
+import org.morganm.activitytracker.LogManager;
 
 import de.diddiz.LogBlock.LogBlock;
 import de.diddiz.LogBlock.QueryParams;

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.morganm.activitytracker;
+package org.morganm.activitytracker.util;
 
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;

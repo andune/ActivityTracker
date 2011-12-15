@@ -5,6 +5,10 @@ package org.morganm.activitytracker;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
+import org.bukkit.entity.Player;
+import org.morganm.activitytracker.util.PermissionSystem;
 
 /** Class to keep track of which players are being tracked.
  * 
@@ -13,8 +17,8 @@ import java.util.List;
  */
 public class TrackerManager {
 	private ActivityTracker plugin;
-	private PermissionWrapper permHandler;
-	private final HashSet<String> trackedPlayers = new HashSet<String>(10);
+	private PermissionSystem permHandler;
+	private final HashSet<Player> trackedPlayers = new HashSet<Player>(10);
 	private List<String> trackedPermissions;
 	
 	public TrackerManager(ActivityTracker plugin) {
@@ -32,24 +36,26 @@ public class TrackerManager {
 			trackedPermissions = null;
 	}
 	
+	public Set<Player> getTrackedPlayers() { return trackedPlayers; }
+	
 	/** Called when a player logs in to give this class the oportunity to determine whether
 	 * it should start tracking them or not.
 	 * 
 	 * @param playerName
 	 */
-	public void playerLogin(String playerName) {
-		if( shouldBeTracked(playerName) )
-			trackedPlayers.add(playerName);
+	public void playerLogin(Player p) {
+		if( shouldBeTracked(p) )
+			trackedPlayers.add(p);
 	}
 	
 	public void playerLogout(String playerName) {
 		trackedPlayers.remove(playerName);
 	}
 	
-	private boolean shouldBeTracked(String playerName) {
+	private boolean shouldBeTracked(Player p) {
 		if( trackedPermissions != null ) {
 			for(String perm : trackedPermissions) {
-				if( permHandler.has(playerName, perm) )
+				if( permHandler.has(p, perm) )
 					return true;
 			}
 		}
@@ -57,7 +63,7 @@ public class TrackerManager {
 		return false;
 	}
 	
-	public boolean isTracked(String playerName) {
-		return trackedPlayers.contains(playerName);
+	public boolean isTracked(Player p) {
+		return trackedPlayers.contains(p);
 	}
 }

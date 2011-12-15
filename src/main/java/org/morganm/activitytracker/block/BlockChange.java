@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.morganm.activitytracker;
+package org.morganm.activitytracker.block;
 
 import org.bukkit.Material;
 import org.bukkit.World;

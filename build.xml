@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<project name="ActivityLogger" default="dist" basedir=".">
+<project name="ActivityTracker" default="dist" basedir=".">
         <property file="${basedir}/build.local.properties" />
         <property file="${basedir}/build.properties" />
 
@@ -29,9 +29,13 @@
 	</target>
 
 	<target name="dist" depends="compile" description="Generates distribution jar file">
+                <buildnumber />
 		<copy todir="${build.home}">
 			<fileset dir="${config.home}">
 				<include name="**/*.yml"/>
+			</fileset>
+			<fileset dir="${basedir}" >
+				<include name="build.number"/>
 			</fileset>
 		</copy>
 
