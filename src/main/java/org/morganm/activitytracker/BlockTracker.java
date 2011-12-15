@@ -13,13 +13,13 @@ package org.morganm.activitytracker;
 public class BlockTracker {
 	private static final int BUFFER_MAX = 1000;
 	
-	private ActivityTracker plugin;
+//	private ActivityTracker plugin;
 	private BlockChange[] buffer = new BlockChange[BUFFER_MAX];
 	private int start = 0;
 	private int end = 0;
 	
 	public BlockTracker(ActivityTracker plugin) {
-		this.plugin = plugin;
+//		this.plugin = plugin;
 	}
 
 	/** Used to pop a BlockChange out of the buffer. This actually just moves circular buffer

@@ -25,10 +25,14 @@ public class ActivityTracker extends JavaPlugin {
 	private MyBlockListener blockListener;
 	private MyPlayerListener playerListener;
 	private MyEntityListener entityListener;
+	private PermissionWrapper perm;
 	
 	@Override
 	public void onEnable() {
 		version = getDescription().getVersion();
+		
+		perm = new PermissionWrapper(this, log, logPrefix);
+		perm.setupPermissions();
 		
 		trackerManager = new TrackerManager(this);
 		logManager = new LogManager(this);
@@ -75,4 +79,5 @@ public class ActivityTracker extends JavaPlugin {
 	public TrackerManager getTrackerManager() { return trackerManager; }
 	public LogManager getLogManager() { return logManager; }
 	public BlockTracker getBlockTracker() { return blockTracker; }
+	public PermissionWrapper getPerm() { return perm; }
 }

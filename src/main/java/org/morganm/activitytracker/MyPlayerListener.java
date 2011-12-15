@@ -183,7 +183,9 @@ public class MyPlayerListener extends PlayerListener {
 		
 		Log log = logManager.getLog(playerName);
 		log.logMessage("player quit");
+		
 		logManager.closeLog(playerName);
+		plugin.getTrackerManager().playerLogout(playerName);
 	}
 	
 	@Override
@@ -194,7 +196,9 @@ public class MyPlayerListener extends PlayerListener {
 		
 		Log log = logManager.getLog(playerName);
 		log.logMessage("player kicked");
+		
 		logManager.closeLog(playerName);
+		plugin.getTrackerManager().playerLogout(playerName);
 	}
 	
 	@Override
