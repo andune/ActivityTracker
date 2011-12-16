@@ -5,6 +5,7 @@ package org.morganm.activitytracker.listener;
 
 import java.util.HashSet;
 
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Type;
 import org.bukkit.event.block.Action;
@@ -95,7 +96,7 @@ public class MyPlayerListener extends PlayerListener {
 		plugin.getMovementTracker().playerLogout(event.getPlayer());
 		
 		Log log = logManager.getLog(playerName);
-		log.logMessage("player kicked");
+		log.logMessage("player kicked, reason: "+event.getReason());
 		logManager.closeLog(playerName);
 	}
 	
@@ -209,13 +210,26 @@ public class MyPlayerListener extends PlayerListener {
 			return;
 		String playerName = event.getPlayer().getName();
 		
+		StringBuilder sb = new StringBuilder();
+		sb.append("playerInteract: action=");
+		sb.append(event.getAction());
+		sb.append(", eventType=");
+		sb.append(event.getType());
+		Block b = event.getClickedBlock();
+		if( b != null ) {
+			sb.append(", clickedBlock=");
+			sb.append("l={");
+			sb.append(util.shortLocationString(b.getLocation()));
+			sb.append("},type=");
+			sb.append(b.getType());
+			sb.append(",data=");
+			sb.append(b.getData());
+		}
+		sb.append(", itemInHand=");
+		sb.append(event.getItem());
+		
 		Log log = logManager.getLog(playerName);
-		log.logMessage("playerInteract: action="+event.getAction()
-				+", eventType="+event.getType()
-				+", clickedBlock="+event.getClickedBlock()
-				+", itemInHand="+event.getItem()
-//				+", isCancelled="+event.isCancelled()
-			);
+		log.logMessage(sb.toString());
 	}
 	
 	@Override

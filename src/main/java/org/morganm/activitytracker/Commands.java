@@ -88,7 +88,7 @@ public class Commands {
 		}
 		else if( "tracklist".equals(cmdName) ) {
 			Set<Player> trackedPlayers = plugin.getTrackerManager().getTrackedPlayers();
-			StringBuffer sb = new StringBuffer();
+			StringBuilder sb = new StringBuilder();
 			for(Player p : trackedPlayers) {
 				if( sb.length() > 0 )
 					sb.append(", ");

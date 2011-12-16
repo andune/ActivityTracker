@@ -99,12 +99,12 @@ public class Debug {
 	 * 
 	 * debug("Some string"+someValue+", some other string "+someOtherValue);
 	 * 
-	 * since in that form, the StringBuffer() addition must be incurred for every debug
+	 * since in that form, the StringBuilder() addition must be incurred for every debug
 	 * call, even if debugging is off. With this method, the above statement becomes:
 	 * 
 	 * debug("Some string", someValue, ", some other string ", someOtherValue);
 	 * 
-	 * and the StringBuffer() penalty is only incurred if debugging is actually enabled.
+	 * and the StringBuilder() penalty is only incurred if debugging is actually enabled.
 	 * This reduces the penalty of debugs (when debugging is off) to simply that of
 	 * a function call and a single if check. Not quite as good as C #ifdef preprocessing
 	 * but it's about as close as we can get under Java.
@@ -112,7 +112,7 @@ public class Debug {
 	 * If you look at the below method and find yourself thinking "that seems less
 	 * efficient than just letting java do the addition", then you don't know much about
 	 * Java strings. Java converts string addition (within the same literal expression)
-	 * internally into StringBuffer() addition using exactly the same method calls as
+	 * internally into StringBuilder() addition using exactly the same method calls as
 	 * below.
 	 * 
 	 * @param msg
@@ -120,7 +120,7 @@ public class Debug {
 	 */
 	public void debug(Object...args) {
 		if( debug ) {
-			StringBuffer sb = new StringBuffer(logPrefix);
+			StringBuilder sb = new StringBuilder(logPrefix);
 			for(int i=0; i<args.length;i++) {
 				sb.append(args[i]);
 			}
@@ -131,7 +131,7 @@ public class Debug {
 	
 	public void devDebug(Object...args) {
 		if( debug && log.isLoggable(Level.FINEST) ) {
-			StringBuffer sb = new StringBuffer(logPrefix);
+			StringBuilder sb = new StringBuilder(logPrefix);
 			for(int i=0; i<args.length;i++) {
 				sb.append(args[i]);
 			}

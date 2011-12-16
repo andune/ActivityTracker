@@ -122,7 +122,7 @@ public class BlockLogger implements Runnable {
 			}
 			else if( bc.eventType == Type.SIGN_CHANGE ) {
 				// record sign data, if any
-				StringBuffer signData = new StringBuffer();
+				StringBuilder signData = new StringBuilder();
 				if( bc.signData != null ) {
 					for(int i=0; i < bc.signData.length; i++) {
 						if( signData.length() > 0 )
