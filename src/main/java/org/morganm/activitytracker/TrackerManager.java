@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.bukkit.entity.Player;
+import org.morganm.activitytracker.util.Debug;
 import org.morganm.activitytracker.util.PermissionSystem;
 
 /** Class to keep track of which players are being tracked.
@@ -20,14 +21,15 @@ public class TrackerManager {
 	private PermissionSystem permHandler;
 	private final HashSet<Player> trackedPlayers = new HashSet<Player>(10);
 	private List<String> trackedPermissions;
+	private Debug debug;
 	
 	public TrackerManager(ActivityTracker plugin) {
 		this.plugin = plugin;
 		this.permHandler = this.plugin.getPerm();
 		loadConfig();
+		debug = Debug.getInstance();
 	}
 	
-	@SuppressWarnings("unchecked")
 	public void loadConfig() {
 		if( plugin.getConfig().get("trackedPermissions") != null ) {
 			trackedPermissions = plugin.getConfig().getStringList("trackedPermissions");
@@ -44,26 +46,50 @@ public class TrackerManager {
 	 * @param playerName
 	 */
 	public void playerLogin(Player p) {
+		debug.debug("playerLogin(): ",p);
 		if( shouldBeTracked(p) )
 			trackedPlayers.add(p);
 	}
 	
-	public void playerLogout(String playerName) {
-		trackedPlayers.remove(playerName);
+	/** Manual way to specify a player to be tracked.
+	 * 
+	 * @param p
+	 */
+	public void trackPlayer(Player p) {
+		trackedPlayers.add(p);
+	}
+	/** Manual way to specify a player to stop tracking.
+	 * 
+	 * @param p
+	 */
+	public void unTrackPlayer(Player p) {
+		trackedPlayers.remove(p);
+	}
+	
+	public void playerLogout(Player p) {
+		trackedPlayers.remove(p);
 	}
 	
 	private boolean shouldBeTracked(Player p) {
+		boolean shouldBeTracked = false;
+		
 		if( trackedPermissions != null ) {
 			for(String perm : trackedPermissions) {
-				if( permHandler.has(p, perm) )
-					return true;
+				debug.debug("shouldBeTracked(): p=",p," checking perm ",perm);
+				if( permHandler.has(p, perm) ) {
+					shouldBeTracked = true;
+					break;
+				}
 			}
 		}
 		
-		return false;
+		debug.debug("shouldBeTracked(): p=",p," shouldBeTracked=",shouldBeTracked);
+		return shouldBeTracked;
 	}
 	
 	public boolean isTracked(Player p) {
-		return trackedPlayers.contains(p);
+		boolean isTracked = trackedPlayers.contains(p);
+		debug.debug("isTracked for player ",p," = ",isTracked);
+		return isTracked;
 	}
 }

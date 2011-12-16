@@ -3,12 +3,12 @@
  */
 package org.morganm.activitytracker;
 
-import java.io.InputStream;
-import java.util.Properties;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
+import java.io.File;
 import java.util.logging.Logger;
 
+import org.bukkit.Bukkit;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event.Type;
 import org.bukkit.plugin.PluginManager;
@@ -18,6 +18,8 @@ import org.morganm.activitytracker.block.BlockTracker;
 import org.morganm.activitytracker.listener.MyBlockListener;
 import org.morganm.activitytracker.listener.MyEntityListener;
 import org.morganm.activitytracker.listener.MyPlayerListener;
+import org.morganm.activitytracker.util.Debug;
+import org.morganm.activitytracker.util.JarUtils;
 import org.morganm.activitytracker.util.PermissionSystem;
 
 /**
@@ -30,6 +32,11 @@ public class ActivityTracker extends JavaPlugin {
 
 	private String version;
 	private int buildNumber = -1;
+	private boolean configLoaded = false;
+	
+	private PermissionSystem perm;
+	private JarUtils jarUtil;
+	
 	private TrackerManager trackerManager;
 	private LogManager logManager;
 	private BlockTracker blockTracker;
@@ -37,12 +44,17 @@ public class ActivityTracker extends JavaPlugin {
 	private MyPlayerListener playerListener;
 	private MyEntityListener entityListener;
 	private MovementTracker movementTracker;
-	private PermissionSystem perm;
+	private Commands commandProcessor;
 	
 	@Override
 	public void onEnable() {
 		version = getDescription().getVersion();
-		buildNumber = getBuildNumber();
+		jarUtil = new JarUtils(this, getFile(), log, logPrefix);
+		buildNumber = jarUtil.getBuildNumber();
+		
+		loadConfig();
+		
+		System.out.println("bukkit version = "+Bukkit.getBukkitVersion());
 		
 		perm = new PermissionSystem(this, log, logPrefix);
 		perm.setupPermissions();
@@ -50,6 +62,7 @@ public class ActivityTracker extends JavaPlugin {
 		trackerManager = new TrackerManager(this);
 		logManager = new LogManager(this);
 		blockTracker = new BlockTracker(this);
+		commandProcessor = new Commands(this);
 		
 		PluginManager pm = getServer().getPluginManager();
 		blockListener = new MyBlockListener(this);
@@ -90,33 +103,33 @@ public class ActivityTracker extends JavaPlugin {
 		getServer().getScheduler().cancelAllTasks();
 		log.info(logPrefix + "version "+version+", build "+buildNumber+" is enabled");
 	}
+	
+	@Override
+	public boolean onCommand(CommandSender sender, Command command,
+			String label, String[] args) {
+		return commandProcessor.onCommand(sender, command, label, args);
+	}
 
+	public void loadConfig() {
+		File file = new File(getDataFolder(), "config.yml");
+		if( !file.exists() ) {
+			jarUtil.copyConfigFromJar("config.yml", file);
+		}
+		
+		if( !configLoaded ) {
+			super.getConfig();
+			configLoaded = true;
+		}
+		else
+			super.reloadConfig();
+		
+		Debug.getInstance().init(log, logPrefix, getConfig().getBoolean("debug", false));
+	}
+	
 	public TrackerManager getTrackerManager() { return trackerManager; }
 	public LogManager getLogManager() { return logManager; }
 	public BlockTracker getBlockTracker() { return blockTracker; }
 	public PermissionSystem getPerm() { return perm; }
 	public MovementTracker getMovementTracker() { return movementTracker; }
 	
-    private int getBuildNumber() {
-    	int buildNum = -1;
-    	
-        try {
-        	JarFile jar = new JarFile(getFile());
-        	
-            JarEntry entry = jar.getJarEntry("build.number");
-            InputStream is = jar.getInputStream(entry);
-        	Properties props = new Properties();
-        	props.load(is);
-        	is.close();
-        	Object o = props.get("build.number");
-        	if( o instanceof Integer )
-        		buildNum = ((Integer) o).intValue();
-        	else if( o instanceof String )
-        		buildNum = Integer.parseInt((String) o);
-        } catch (Exception e) {
-            log.warning(logPrefix + " Could not load build number from JAR");
-        }
-        
-        return buildNum;
-    }
 }

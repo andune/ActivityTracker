@@ -1,2 +1,4 @@
-trackPermissions:
+trackedPermissions:
 - group.GuestLogin
+
+debug: false

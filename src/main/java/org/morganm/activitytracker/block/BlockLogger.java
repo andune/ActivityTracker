@@ -11,6 +11,7 @@ import org.bukkit.plugin.Plugin;
 import org.morganm.activitytracker.ActivityTracker;
 import org.morganm.activitytracker.Log;
 import org.morganm.activitytracker.LogManager;
+import org.morganm.activitytracker.util.Debug;
 
 import de.diddiz.LogBlock.LogBlock;
 import de.diddiz.LogBlock.QueryParams;
@@ -24,10 +25,11 @@ public class BlockLogger implements Runnable {
 	private static final Logger logger = ActivityTracker.log;
 	private static final String logPrefix = ActivityTracker.logPrefix;
 	
-	private ActivityTracker plugin;
-	private BlockTracker tracker;
-	private LogManager logManager;
-	private LogBlock logBlock;
+	private final ActivityTracker plugin;
+	private final BlockTracker tracker;
+	private final LogManager logManager;
+	private final LogBlock logBlock;
+	private final Debug debug;
 	
 	public BlockLogger(ActivityTracker plugin) {
 		this.plugin = plugin;
@@ -36,7 +38,11 @@ public class BlockLogger implements Runnable {
 		
 		Plugin p = this.plugin.getServer().getPluginManager().getPlugin("LogBlock");
 		if( p instanceof LogBlock )
-			this.logBlock = (LogBlock) p; 
+			this.logBlock = (LogBlock) p;
+		else
+			this.logBlock = null;
+		
+		this.debug = Debug.getInstance();
 	}
 
 	public void run() {
@@ -44,6 +50,7 @@ public class BlockLogger implements Runnable {
 		
 		// run until the queue is empty
 		while( (bc = tracker.getStartObject()) != null ) {
+			debug.debug("BlockLogger.run(): queue has an object pending, processing");
 			Log log = logManager.getLog(bc.playerName);
 			
 			if( bc.eventType == Type.BLOCK_BREAK ) {

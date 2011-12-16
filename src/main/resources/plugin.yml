@@ -1,5 +1,21 @@
 name: ActivityTracker
 main: org.morganm.activitytracker.ActivityTracker
-version: 0.1
+version: 0.2
 author: morganm
 softdepend: [LogBlock]
+commands:
+  at:
+    description: Admin control functions for ActivityTracker
+    permission: activitytracker.admin
+    usage: /<command> reload - reload the config file
+  track:
+    description: Start tracking a player
+    permission: activitytracker.track
+    usage: /<command> player - Start tracking named player
+  untrack:
+    description: Stop tracking a player
+    permission: activitytracker.track
+    usage: /<command> player - Stop tracking named player
+  tracklist:
+    description: Show who is currently being tracked
+    permission: activitytracker.track

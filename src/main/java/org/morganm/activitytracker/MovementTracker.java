@@ -3,11 +3,14 @@
  */
 package org.morganm.activitytracker;
 
+import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Set;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.morganm.activitytracker.util.Debug;
+import org.morganm.activitytracker.util.General;
 
 /** Rather than hooking the expensive PLAYER_MOVE and forcing the Bukkit overhead associated with
  * producing and processing those events on every PLAYER_MOVE, we instead schedule a process to
@@ -23,11 +26,17 @@ public class MovementTracker implements Runnable {
 	private final TrackerManager trackerMgr;
 	private final LogManager logManager;
 	private final HashMap<Player,Location> positions = new HashMap<Player,Location>(10);
+	private final Debug debug;
+	private final General util;
+	
+	private final DecimalFormat df = new DecimalFormat("#.#");
 	
 	public MovementTracker(ActivityTracker plugin) {
 		this.plugin = plugin;
 		this.trackerMgr = this.plugin.getTrackerManager();
 		this.logManager = this.plugin.getLogManager();
+		this.debug = Debug.getInstance();
+		this.util = General.getInstance();
 	}
 	
 	public void playerLogout(Player p) {
@@ -43,6 +52,9 @@ public class MovementTracker implements Runnable {
 				positions.put(p, curPos);
 				continue;
 			}
+			positions.put(p, curPos);
+			
+			debug.debug("MovementTracker.run(): processing movement for player ",p);
 			
 			String curWorld = curPos.getWorld().getName();
 			String prevWorld = prevPos.getWorld().getName();
@@ -53,14 +65,14 @@ public class MovementTracker implements Runnable {
 					|| curPos.getBlockZ() != prevPos.getBlockZ() ) {
 				String distanceString = null;
 				if( curWorld.equals(prevWorld) )
-					Double.toString(curPos.distance(prevPos));
+					distanceString = df.format(curPos.distance(prevPos));
 				else
 					distanceString = "(crossworld)";
 				
 				log.logMessage("player moved distance "
 						+ distanceString
-						+", curLoc="+curPos
-						+", prevLoc="+prevPos);
+						+", curLoc="+util.shortLocationString(curPos)
+						+", prevLoc="+util.shortLocationString(prevPos));
 			}
 		}
 	}

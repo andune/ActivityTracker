@@ -18,8 +18,9 @@ import java.util.logging.Logger;
 public class Log {
 	// TODO: externalize to config
 	private static final String LOG_DIR = "plugins/ActivityTracker/logs";
+	private static final long FLUSH_FREQUENCY_MILLIS = 5000;
 	
-	private static final DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.LONG);
+	private static final DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM);
 	private static final Logger log = ActivityTracker.log;
 	private static final String logPrefix = ActivityTracker.logPrefix;
 	
@@ -27,6 +28,8 @@ public class Log {
 	private String playerName;
 	private File file;
 	private FileWriter writer;
+	
+	private long lastFlush;
 	
 	public Log(ActivityTracker plugin, String playerName) {
 //		this.plugin = plugin;
@@ -42,7 +45,11 @@ public class Log {
 			writer = null;
 		}
 		
-		file = new File(LOG_DIR+"/"+playerName);
+		File logDir = new File(LOG_DIR);
+		if( !logDir.exists() )
+			logDir.mkdirs();
+		
+		file = new File(LOG_DIR+"/"+playerName+".log");
 		writer = new FileWriter(file);
 	}
 	
@@ -62,6 +69,9 @@ public class Log {
 			if( writer == null )
 				init();
 			writer.append(msg);
+			
+			if( (System.currentTimeMillis() - lastFlush) > FLUSH_FREQUENCY_MILLIS )
+				writer.flush();
 		}
 		catch(IOException e) {
 			log.warning(logPrefix+"Error ("+e.getMessage()+") writing log message: "+msg);

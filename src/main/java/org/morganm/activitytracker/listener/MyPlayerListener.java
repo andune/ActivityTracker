@@ -3,8 +3,11 @@
  */
 package org.morganm.activitytracker.listener;
 
+import java.util.HashSet;
+
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Type;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
@@ -13,10 +16,9 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerListener;
-import org.bukkit.event.player.PlayerLoginEvent;
-import org.bukkit.event.player.PlayerLoginEvent.Result;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -27,26 +29,34 @@ import org.morganm.activitytracker.ActivityTracker;
 import org.morganm.activitytracker.Log;
 import org.morganm.activitytracker.LogManager;
 import org.morganm.activitytracker.TrackerManager;
+import org.morganm.activitytracker.util.Debug;
+import org.morganm.activitytracker.util.General;
 
 /**
  * @author morganm
  *
  */
 public class MyPlayerListener extends PlayerListener {
+	private final HashSet<Integer> leftClickRecord = new HashSet<Integer>(20);
 	private ActivityTracker plugin;
 	private TrackerManager trackerManager;
 	private LogManager logManager;
+	private Debug debug;
+	private General util;
 	
 	public MyPlayerListener(ActivityTracker plugin) {
 		this.plugin = plugin;
 		this.trackerManager = this.plugin.getTrackerManager();
 		this.logManager = this.plugin.getLogManager();
+		this.debug = Debug.getInstance();
+		this.util = General.getInstance();
+		
+		initializeLeftClickRecordMap();
 	}
 	
 	@Override
-	public void onPlayerLogin(PlayerLoginEvent event) {
-		if( event.getResult() != Result.ALLOWED )
-			return;
+	public void onPlayerJoin(PlayerJoinEvent event) {
+		debug.debug("onPlayerJoin: event=",event);
 		
 		String playerName = event.getPlayer().getName();
 		trackerManager.playerLogin(event.getPlayer());
@@ -64,12 +74,12 @@ public class MyPlayerListener extends PlayerListener {
 			return;
 		String playerName = event.getPlayer().getName();
 		
+		plugin.getTrackerManager().playerLogout(event.getPlayer());
+		plugin.getMovementTracker().playerLogout(event.getPlayer());
+		
 		Log log = logManager.getLog(playerName);
 		log.logMessage("player quit");
-		
 		logManager.closeLog(playerName);
-		plugin.getTrackerManager().playerLogout(playerName);
-		plugin.getMovementTracker().playerLogout(event.getPlayer());
 	}
 	
 	@Override
@@ -80,12 +90,12 @@ public class MyPlayerListener extends PlayerListener {
 			return;
 		String playerName = event.getPlayer().getName();
 		
+		plugin.getTrackerManager().playerLogout(event.getPlayer());
+		plugin.getMovementTracker().playerLogout(event.getPlayer());
+		
 		Log log = logManager.getLog(playerName);
 		log.logMessage("player kicked");
-		
 		logManager.closeLog(playerName);
-		plugin.getTrackerManager().playerLogout(playerName);
-		plugin.getMovementTracker().playerLogout(event.getPlayer());
 	}
 	
 	@Override
@@ -115,7 +125,8 @@ public class MyPlayerListener extends PlayerListener {
 		String playerName = event.getPlayer().getName();
 		
 		Log log = logManager.getLog(playerName);
-		log.logMessage("emptied bucket "+event.getBucket()+" at block "+event.getBlockClicked().getLocation());
+		log.logMessage("emptied bucket "+event.getBucket()+" at block "
+				+util.shortLocationString(event.getBlockClicked().getLocation()));
 	}
 	
 	@Override
@@ -127,7 +138,9 @@ public class MyPlayerListener extends PlayerListener {
 		String playerName = event.getPlayer().getName();
 		
 		Log log = logManager.getLog(playerName);
-		log.logMessage("filled bucket "+event.getBucket()+" at block "+event.getBlockClicked().getLocation()+", blockType="+event.getBlockClicked().getType());
+		log.logMessage("filled bucket "+event.getBucket()+" at block "
+				+util.shortLocationString(event.getBlockClicked().getLocation())
+				+", blockType="+event.getBlockClicked().getType());
 	}
 	
 	@Override
@@ -165,7 +178,8 @@ public class MyPlayerListener extends PlayerListener {
 		String playerName = event.getPlayer().getName();
 		
 		Log log = logManager.getLog(playerName);
-		log.logMessage("player dropped item "+event.getItemDrop()+" at location "+event.getPlayer().getLocation());
+		log.logMessage("player dropped item "+event.getItemDrop()+" at location "
+				+util.shortLocationString(event.getPlayer().getLocation()));
 	}
 	
 	@Override
@@ -174,6 +188,8 @@ public class MyPlayerListener extends PlayerListener {
 			return;
 		// we ignore these since they will get picked up by onBlockPlace events
 		if( event.isBlockInHand() )
+			return;
+		if( event.getAction() == Action.LEFT_CLICK_BLOCK && !leftClickRecord.contains(Integer.valueOf(event.getClickedBlock().getTypeId())) )
 			return;
 		
 		if( !trackerManager.isTracked(event.getPlayer()) )
@@ -214,7 +230,8 @@ public class MyPlayerListener extends PlayerListener {
 		String playerName = event.getPlayer().getName();
 		
 		Log log = logManager.getLog(playerName);
-		log.logMessage("player picked up item "+event.getItem()+" at location "+event.getPlayer().getLocation());
+		log.logMessage("player picked up item "+event.getItem().getItemStack()+" at location "
+				+ util.shortLocationString(event.getPlayer().getLocation()));
 	}
 	
 	@Override
@@ -226,7 +243,8 @@ public class MyPlayerListener extends PlayerListener {
 		String playerName = event.getPlayer().getName();
 		
 		Log log = logManager.getLog(playerName);
-		log.logMessage("used portal to location "+event.getTo()+" from location "+event.getFrom());
+		log.logMessage("used portal to location "+util.shortLocationString(event.getTo())
+				+" from location "+util.shortLocationString(event.getFrom()));
 	}
 	
 	@Override
@@ -236,7 +254,7 @@ public class MyPlayerListener extends PlayerListener {
 		String playerName = event.getPlayer().getName();
 		
 		Log log = logManager.getLog(playerName);
-		log.logMessage("player respawned at location "+event.getRespawnLocation());
+		log.logMessage("player respawned at location "+util.shortLocationString(event.getRespawnLocation()));
 	}
 	
 	@Override
@@ -248,6 +266,21 @@ public class MyPlayerListener extends PlayerListener {
 		String playerName = event.getPlayer().getName();
 		
 		Log log = logManager.getLog(playerName);
-		log.logMessage("player teleported from location "+event.getFrom()+" to location "+event.getTo());
+		log.logMessage("player teleported from location "+util.shortLocationString(event.getFrom())
+				+" to location "+util.shortLocationString(event.getTo()));
+	}
+	
+	private void initializeLeftClickRecordMap() {
+		leftClickRecord.add(Integer.valueOf(54));		// chest
+		leftClickRecord.add(Integer.valueOf(63));		// sign post
+		leftClickRecord.add(Integer.valueOf(64));		// wooden door
+		leftClickRecord.add(Integer.valueOf(68));		// wall sign
+		leftClickRecord.add(Integer.valueOf(69));		// lever
+		leftClickRecord.add(Integer.valueOf(71));		// iron door
+		leftClickRecord.add(Integer.valueOf(77));		// stone button
+		leftClickRecord.add(Integer.valueOf(92));		// cake block (do we care?)
+		leftClickRecord.add(Integer.valueOf(95));		// locked chest
+		leftClickRecord.add(Integer.valueOf(96));		// trapdoor
+		leftClickRecord.add(Integer.valueOf(116));		// enchantment table
 	}
 }
