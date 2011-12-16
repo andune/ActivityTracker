@@ -217,7 +217,7 @@ public class MyPlayerListener extends PlayerListener {
 		log.logMessage("playerInteract: entity="+event.getRightClicked()
 				+", eventType="+event.getType()
 				+", eventName="+(event.getType() == Type.CUSTOM_EVENT ? event.getEventName() : "null")
-				+", isCancelled="+event.isCancelled()
+//				+", isCancelled="+event.isCancelled()
 			);
 	}
 	
