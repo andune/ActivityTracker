@@ -3,6 +3,8 @@
  */
 package org.morganm.activitytracker;
 
+import java.util.Set;
+
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -83,6 +85,19 @@ public class Commands {
 				sender.sendMessage(command.getUsage());
 			
 			return true;
+		}
+		else if( "tracklist".equals(cmdName) ) {
+			Set<Player> trackedPlayers = plugin.getTrackerManager().getTrackedPlayers();
+			StringBuffer sb = new StringBuffer();
+			for(Player p : trackedPlayers) {
+				if( sb.length() > 0 )
+					sb.append(", ");
+				sb.append(p.getName());
+			}
+			if( sb.length() == 0 )
+				sb.append("(none");
+			
+			sender.sendMessage(ChatColor.YELLOW+"Currently tracked players: "+sb.toString());
 		}
 
 		return false;

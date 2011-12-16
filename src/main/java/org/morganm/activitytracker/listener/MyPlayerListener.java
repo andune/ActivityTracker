@@ -12,6 +12,7 @@ import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerChatEvent;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -99,6 +100,18 @@ public class MyPlayerListener extends PlayerListener {
 	}
 	
 	@Override
+	public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
+		if( event.isCancelled() )
+			return;
+		if( !trackerManager.isTracked(event.getPlayer()) )
+			return;
+		String playerName = event.getPlayer().getName();
+		
+		Log log = logManager.getLog(playerName);
+		log.logMessage("player command (pre-process): "+event.getMessage());
+	}
+	
+	@Override
 	public void onItemHeldChange(PlayerItemHeldEvent event) {
 		if( !trackerManager.isTracked(event.getPlayer()) )
 			return;
@@ -178,7 +191,7 @@ public class MyPlayerListener extends PlayerListener {
 		String playerName = event.getPlayer().getName();
 		
 		Log log = logManager.getLog(playerName);
-		log.logMessage("player dropped item "+event.getItemDrop()+" at location "
+		log.logMessage("player dropped item "+event.getItemDrop().getItemStack()+" at location "
 				+util.shortLocationString(event.getPlayer().getLocation()));
 	}
 	
@@ -187,7 +200,7 @@ public class MyPlayerListener extends PlayerListener {
 		if( event.isCancelled() )
 			return;
 		// we ignore these since they will get picked up by onBlockPlace events
-		if( event.isBlockInHand() )
+		if( event.getAction() == Action.RIGHT_CLICK_BLOCK && event.isBlockInHand() )
 			return;
 		if( event.getAction() == Action.LEFT_CLICK_BLOCK && !leftClickRecord.contains(Integer.valueOf(event.getClickedBlock().getTypeId())) )
 			return;
@@ -201,7 +214,7 @@ public class MyPlayerListener extends PlayerListener {
 				+", eventType="+event.getType()
 				+", clickedBlock="+event.getClickedBlock()
 				+", itemInHand="+event.getItem()
-				+", isCancelled="+event.isCancelled()
+//				+", isCancelled="+event.isCancelled()
 			);
 	}
 	

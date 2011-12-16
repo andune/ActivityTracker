@@ -27,6 +27,8 @@ public class BlockChange {
 	public Material type;
 	public byte data;
 	
+	public String[] signData;
+	
 	public String locationString() {
 		return "{"+world.getName()+",x="+x+",y="+y+",z="+z+"}";
 	}

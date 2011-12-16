@@ -50,7 +50,7 @@ public class Log {
 			logDir.mkdirs();
 		
 		file = new File(LOG_DIR+"/"+playerName+".log");
-		writer = new FileWriter(file);
+		writer = new FileWriter(file, true);
 	}
 	
 	public void close() {

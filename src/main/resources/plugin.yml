@@ -1,6 +1,6 @@
 name: ActivityTracker
 main: org.morganm.activitytracker.ActivityTracker
-version: 0.2
+version: 0.3
 author: morganm
 softdepend: [LogBlock]
 commands:

@@ -5,6 +5,7 @@ package org.morganm.activitytracker;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 /** Class to manage log files, one per player.
@@ -51,5 +52,10 @@ public class LogManager {
 			log.close();
 			logs.remove(playerName);
 		}
+	}
+	
+	public void closeAll() {
+		for(Entry<String, Log> e : logs.entrySet())
+			e.getValue().close();
 	}
 }

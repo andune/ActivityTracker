@@ -28,8 +28,9 @@ public class BlockLogger implements Runnable {
 	private final ActivityTracker plugin;
 	private final BlockTracker tracker;
 	private final LogManager logManager;
-	private final LogBlock logBlock;
 	private final Debug debug;
+	private LogBlock logBlock;
+	private boolean isCanceled = false;
 	
 	public BlockLogger(ActivityTracker plugin) {
 		this.plugin = plugin;
@@ -44,8 +45,16 @@ public class BlockLogger implements Runnable {
 		
 		this.debug = Debug.getInstance();
 	}
+	
+	public void cancel() {
+		isCanceled = true;
+		this.logBlock = null;
+	}
 
 	public void run() {
+		if( isCanceled )
+			return;
+		
 		BlockChange bc = null;
 		
 		// run until the queue is empty
@@ -58,32 +67,50 @@ public class BlockLogger implements Runnable {
 				
 				// if it's a broken block and we have logBlock, lookup the owner
 				if( logBlock != null ) {
+					debug.debug("running logBlock query");
 					QueryParams params = new QueryParams(logBlock);
 					params.bct = BlockChangeType.CREATED;
-					params.since = 43200;		// is this in minutes?  seconds? 43200 = 30 days in minutes
+//					params.since = 43200;		// 30 days
+					params.since = 107373;		// roughly 3 months
 					params.loc = new Location(bc.world, bc.x, bc.y, bc.z);
 					params.world = bc.world;
 					params.silent = true;
-					params.needDate = true;
+//					params.needDate = true;
 					params.needType = true;
-					params.needData = true;
+					params.needPlayer = true;
+					params.radius = 0;
 					// order descending and limit 1, we just want the most recent blockChange
 					params.limit = 1;
 					params.order = QueryParams.Order.DESC;
 					try {
-						for (de.diddiz.LogBlock.BlockChange lbChange : logBlock.getBlockChanges(params))
-							lbOwner = lbChange.playerName;
+						if( debug.isDevDebug() ) {
+							debug.devDebug("logBlock query = ",params.getQuery());
+						}
+						for (de.diddiz.LogBlock.BlockChange lbChange : logBlock.getBlockChanges(params)) {
+							// we only count owner if the block destroyed was the same type placed,
+							// this avoids logging when people cut down trees that were previously
+							// saplings planted by players, etc
+							if( lbChange.type == bc.type.getId() )
+								lbOwner = lbChange.playerName;
+							debug.debug("got logBlock result, lbOwner=",lbOwner);
+						}
 					}
 					catch(Exception e) {
 						e.printStackTrace();
 					}
 				}
+				String postMsg = "";
+				if( "(none)".equals(lbOwner) )
+					debug.debug("no logBlock owner found");
+				else if( !bc.playerName.equals(lbOwner) )
+					postMsg = " ** NOT BLOCK OWNER **";
 				
 				log.logMessage(bc.time, "block broken at "
 						+bc.locationString()
 						+", blockType="+bc.type
 						+", lbOwner="+lbOwner
 						+", blockData="+bc.data
+						+postMsg
 					);
 			}
 			else if( bc.eventType == Type.BLOCK_PLACE ) {
@@ -91,6 +118,25 @@ public class BlockLogger implements Runnable {
 						+bc.locationString()
 						+", blockType="+bc.type
 						+", blockData="+bc.data
+					);
+			}
+			else if( bc.eventType == Type.SIGN_CHANGE ) {
+				// record sign data, if any
+				StringBuffer signData = new StringBuffer();
+				if( bc.signData != null ) {
+					for(int i=0; i < bc.signData.length; i++) {
+						if( signData.length() > 0 )
+							signData.append("|");
+						signData.append(bc.signData[i]);
+					}
+					signData.insert(0, ", Sign data: ");
+				}
+				
+				log.logMessage(bc.time, "sign text changed at "
+						+bc.locationString()
+						+", blockType="+bc.type
+						+", blockData="+bc.data
+						+signData
 					);
 			}
 			else {

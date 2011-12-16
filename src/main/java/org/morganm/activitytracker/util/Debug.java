@@ -80,6 +80,7 @@ public class Debug {
 		}
 	}
 	public boolean isDebug() { return debug; }
+	public boolean isDevDebug() { return debug && log.isLoggable(Level.FINEST); }
 	
 	public static Debug getInstance() {
 		if( instance == null ) {
