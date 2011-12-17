@@ -3,6 +3,7 @@
  */
 package org.morganm.activitytracker.listener;
 
+import java.util.HashMap;
 import java.util.HashSet;
 
 import org.bukkit.block.Block;
@@ -45,6 +46,7 @@ public class MyPlayerListener extends PlayerListener {
 	private LogManager logManager;
 	private Debug debug;
 	private General util;
+	private HashMap<String, String> banReasons = new HashMap<String, String>(20);
 	
 	public MyPlayerListener(ActivityTracker plugin) {
 		this.plugin = plugin;
@@ -96,12 +98,24 @@ public class MyPlayerListener extends PlayerListener {
 		plugin.getMovementTracker().playerLogout(event.getPlayer());
 		
 		Log log = logManager.getLog(playerName);
-		log.logMessage("player kicked, reason: "+event.getReason());
+		log.logMessage("player kicked (banReason: "+banReasons.get(playerName)+")");
+		banReasons.remove(playerName);
 		logManager.closeLog(playerName);
 	}
 	
 	@Override
 	public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
+		// we don't care about permissions checks, we're just capturing the reason
+		// for future use. If the person can't actually kick/ban, then this won't
+		// ever get used so it doesn't matter.
+		if( event.getMessage().startsWith("/ban") ) {
+			String msg = event.getMessage();
+			String[] parts = msg.split(" ");
+			if( parts.length > 1 ) {
+				banReasons.put(parts[1], msg);
+			}
+		}
+		
 		if( event.isCancelled() )
 			return;
 		if( !trackerManager.isTracked(event.getPlayer()) )
