@@ -3,9 +3,11 @@
  */
 package org.morganm.activitytracker;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.logging.Logger;
@@ -27,7 +29,7 @@ public class Log {
 //	private ActivityTracker plugin;
 	private String playerName;
 	private File file;
-	private FileWriter writer;
+	private Writer writer;
 	
 	private long lastFlush;
 	
@@ -50,7 +52,7 @@ public class Log {
 			logDir.mkdirs();
 		
 		file = new File(LOG_DIR+"/"+playerName+".log");
-		writer = new FileWriter(file, true);
+		writer = new BufferedWriter(new FileWriter(file, true), 16384);
 	}
 	
 	public void close() {

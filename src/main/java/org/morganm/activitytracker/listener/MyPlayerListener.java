@@ -173,8 +173,10 @@ public class MyPlayerListener extends PlayerListener {
 	
 	@Override
 	public void onPlayerChat(PlayerChatEvent event) {
-		if( event.isCancelled() )
-			return;
+		// we ignore isCancelled, since HeroChat, at least, sets this when it processes
+		// a chat. So we just log every chat that comes through, cancelled or not.
+//		if( event.isCancelled() )
+//			return;
 		if( !trackerManager.isTracked(event.getPlayer()) )
 			return;
 		String playerName = event.getPlayer().getName();

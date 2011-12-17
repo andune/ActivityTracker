@@ -88,6 +88,9 @@ public class TrackerManager {
 	}
 	
 	public boolean isTracked(Player p) {
+		if( p == null )
+			return false;
+		
 		boolean isTracked = trackedPlayers.contains(p);
 		debug.debug("isTracked for player ",p," = ",isTracked);
 		return isTracked;

@@ -5,6 +5,8 @@ package org.morganm.activitytracker.listener;
 
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityListener;
 import org.morganm.activitytracker.ActivityTracker;
@@ -30,15 +32,41 @@ public class MyEntityListener extends EntityListener {
 	@Override
 	public void onEntityDeath(EntityDeathEvent event) {
 		Entity e = event.getEntity();
-		if( !(e instanceof Player) )
-			return;
-		Player p = (Player) e;
+		Entity killerE = null;
 		
-		if( !trackerManager.isTracked(p) )
-			return;
-		String playerName = p.getName();
+		EntityDamageEvent lastDamageEvent = e.getLastDamageCause();
+		if( lastDamageEvent instanceof EntityDamageByEntityEvent ) {
+			EntityDamageByEntityEvent edbee = (EntityDamageByEntityEvent) lastDamageEvent;
+			killerE = edbee.getEntity();
+		}
 		
-		Log log = logManager.getLog(playerName);
-		log.logMessage("player died at location "+p.getLocation());
+		Player p = null;
+		Player killerPlayer = null;
+		if( e instanceof Player )
+			p = (Player) e;
+		if( killerE instanceof Player )
+			killerPlayer = (Player) killerE;
+		// either the entity being killed or the killer must be a player for us to care
+		if( p == null && killerPlayer == null )
+			return;
+		
+		if( !trackerManager.isTracked(p) && !trackerManager.isTracked(killerPlayer) )
+			return;
+		
+		// this player died
+		if( p != null ) {
+			String playerName = p.getName();
+			
+			Log log = logManager.getLog(playerName);
+			log.logMessage("player died at location "+p.getLocation()+", killer="+killerE);
+		}
+		// this player did the killing
+		else if( killerPlayer != null ) {
+			String playerName = killerPlayer.getName();
+			
+			Log log = logManager.getLog(playerName);
+			log.logMessage("player killed "+e+" at location "+p.getLocation());
+			
+		}
 	}
 }
