@@ -98,7 +98,7 @@ public class MyPlayerListener extends PlayerListener {
 		plugin.getMovementTracker().playerLogout(event.getPlayer());
 		
 		Log log = logManager.getLog(playerName);
-		log.logMessage("player kicked (banReason: "+banReasons.get(playerName)+")");
+		log.logMessage("player kicked, reason: "+event.getReason()+" (banReason: "+banReasons.get(playerName)+")");
 		banReasons.remove(playerName);
 		logManager.closeLog(playerName);
 	}
