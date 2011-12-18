@@ -2,6 +2,7 @@ v0.4 - December 18, 2011
 * added chest inventory logging (requires Spout)
 * refactored block history to use interface so future interfaces can be added
 easily (HawkEye, Guardian, etc)
+* first public release
 
 v0.3 - December 15, 2011
 * lots of testing and bug fixes
