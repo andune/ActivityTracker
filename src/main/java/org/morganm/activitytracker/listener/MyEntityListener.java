@@ -65,7 +65,7 @@ public class MyEntityListener extends EntityListener {
 			String playerName = killerPlayer.getName();
 			
 			Log log = logManager.getLog(playerName);
-			log.logMessage("player killed "+e+" at location "+p.getLocation());
+			log.logMessage("player killed "+e+" at location "+e.getLocation());
 			
 		}
 	}

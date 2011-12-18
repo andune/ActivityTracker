@@ -7,15 +7,10 @@ import java.util.logging.Logger;
 
 import org.bukkit.Location;
 import org.bukkit.event.Event.Type;
-import org.bukkit.plugin.Plugin;
 import org.morganm.activitytracker.ActivityTracker;
 import org.morganm.activitytracker.Log;
 import org.morganm.activitytracker.LogManager;
 import org.morganm.activitytracker.util.Debug;
-
-import de.diddiz.LogBlock.LogBlock;
-import de.diddiz.LogBlock.QueryParams;
-import de.diddiz.LogBlock.QueryParams.BlockChangeType;
 
 /**
  * @author morganm
@@ -29,26 +24,20 @@ public class BlockLogger implements Runnable {
 	private final BlockTracker tracker;
 	private final LogManager logManager;
 	private final Debug debug;
-	private LogBlock logBlock;
+	private BlockHistoryManager blockHistoryManager;
 	private boolean isCanceled = false;
 	
-	public BlockLogger(ActivityTracker plugin) {
+	public BlockLogger(final ActivityTracker plugin) {
 		this.plugin = plugin;
 		this.tracker = this.plugin.getBlockTracker();
 		this.logManager = this.plugin.getLogManager();
-		
-		Plugin p = this.plugin.getServer().getPluginManager().getPlugin("LogBlock");
-		if( p instanceof LogBlock )
-			this.logBlock = (LogBlock) p;
-		else
-			this.logBlock = null;
-		
+		this.blockHistoryManager = BlockHistoryFactory.getBlockHistoryManager(plugin);
 		this.debug = Debug.getInstance();
 	}
 	
 	public void cancel() {
 		isCanceled = true;
-		this.logBlock = null;
+		this.blockHistoryManager = null;
 	}
 
 	public void run() {
@@ -61,54 +50,31 @@ public class BlockLogger implements Runnable {
 		while( (bc = tracker.getStartObject()) != null ) {
 			debug.debug("BlockLogger.run(): queue has an object pending, processing");
 			Log log = logManager.getLog(bc.playerName);
+			Location l = bc.getLocation();
 			
 			if( bc.eventType == Type.BLOCK_BREAK ) {
-				String lbOwner = "(none)";
+				String blockOwner = "(none)";
 				
-				// if it's a broken block and we have logBlock, lookup the owner
-				if( logBlock != null ) {
-					debug.debug("running logBlock query");
-					QueryParams params = new QueryParams(logBlock);
-					params.bct = BlockChangeType.CREATED;
-//					params.since = 43200;		// 30 days
-					params.since = 107373;		// roughly 3 months
-					params.loc = new Location(bc.world, bc.x, bc.y, bc.z);
-					params.world = bc.world;
-					params.silent = true;
-//					params.needDate = true;
-					params.needType = true;
-					params.needPlayer = true;
-					params.radius = 0;
-					// order descending and limit 1, we just want the most recent blockChange
-					params.limit = 1;
-					params.order = QueryParams.Order.DESC;
-					try {
-						if( debug.isDevDebug() ) {
-							debug.devDebug("logBlock query = ",params.getQuery());
-						}
-						for (de.diddiz.LogBlock.BlockChange lbChange : logBlock.getBlockChanges(params)) {
-							// we only count owner if the block destroyed was the same type placed,
-							// this avoids logging when people cut down trees that were previously
-							// saplings planted by players, etc
-							if( lbChange.type == bc.type.getId() )
-								lbOwner = lbChange.playerName;
-							debug.debug("got logBlock result, lbOwner=",lbOwner);
-						}
-					}
-					catch(Exception e) {
-						e.printStackTrace();
-					}
+				if( blockHistoryManager != null ) {
+					BlockHistory bh = blockHistoryManager.getBlockHistory(l);
+					
+					// we only count owner if the block destroyed was the same type placed,
+					// this avoids logging when people cut down trees that were previously
+					// saplings planted by players, etc
+					if( bh != null && bh.getTypeId() == bc.type.getId() )
+						blockOwner = bh.getOwner();
 				}
+				
 				String postMsg = "";
-				if( "(none)".equals(lbOwner) )
-					debug.debug("no logBlock owner found");
-				else if( !bc.playerName.equals(lbOwner) )
+				if( "(none)".equals(blockOwner) )
+					debug.debug("no block owner found");
+				else if( !bc.playerName.equals(blockOwner) )
 					postMsg = " ** NOT BLOCK OWNER **";
 				
 				log.logMessage(bc.time, "block broken at "
 						+bc.locationString()
 						+", blockType="+bc.type
-						+", lbOwner="+lbOwner
+						+", lbOwner="+blockOwner
 						+", blockData="+bc.data
 						+postMsg
 					);

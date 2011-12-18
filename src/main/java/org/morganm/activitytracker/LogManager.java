@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
 
+import org.bukkit.entity.Player;
+
 /** Class to manage log files, one per player.
  * 
  * @author morganm
@@ -39,6 +41,9 @@ public class LogManager {
 		}
 		
 		return log;
+	}
+	public Log getLog(Player player) {
+		return getLog(player.getName());
 	}
 	
 	/** Called to close a player log and therefore release resources, usually

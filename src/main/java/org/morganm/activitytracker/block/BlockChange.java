@@ -3,6 +3,7 @@
  */
 package org.morganm.activitytracker.block;
 
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.event.Event;
@@ -31,5 +32,8 @@ public class BlockChange {
 	
 	public String locationString() {
 		return "{"+world.getName()+",x="+x+",y="+y+",z="+z+"}";
+	}
+	public Location getLocation() {
+		return new Location(world, x, y, z);
 	}
 }

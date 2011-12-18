@@ -19,6 +19,7 @@ import org.morganm.activitytracker.block.BlockTracker;
 import org.morganm.activitytracker.listener.MyBlockListener;
 import org.morganm.activitytracker.listener.MyEntityListener;
 import org.morganm.activitytracker.listener.MyPlayerListener;
+import org.morganm.activitytracker.listener.MySpoutChestAccessListener;
 import org.morganm.activitytracker.util.Debug;
 import org.morganm.activitytracker.util.JarUtils;
 import org.morganm.activitytracker.util.PermissionSystem;
@@ -95,6 +96,11 @@ public class ActivityTracker extends JavaPlugin {
 		entityListener = new MyEntityListener(this);
 		pm.registerEvent(Type.ENTITY_DEATH, entityListener, Priority.Monitor, this);
 		
+		if (pm.isPluginEnabled("Spout")) {
+			pm.registerEvent(Type.CUSTOM_EVENT, new MySpoutChestAccessListener(this), Priority.Monitor, this);
+			log.info(logPrefix+ "Using Spout API to log chest access");
+		}
+		
 		movementTracker = new MovementTracker(this);
 		getServer().getScheduler().scheduleAsyncRepeatingTask(this, movementTracker, 100, 100);	// every 5 seconds
 		blockLogger = new BlockLogger(this);
@@ -112,6 +118,7 @@ public class ActivityTracker extends JavaPlugin {
 	@Override
 	public void onDisable() {
 		getServer().getScheduler().cancelTasks(this);
+
 		logManager.closeAll();
 		blockLogger.cancel();
 		log.info(logPrefix + "version "+version+", build "+buildNumber+" is disabled");

@@ -1,8 +1,8 @@
 name: ActivityTracker
 main: org.morganm.activitytracker.ActivityTracker
-version: 0.3
+version: 0.4
 author: morganm
-softdepend: [LogBlock]
+softdepend: [LogBlock, Spout]
 commands:
   at:
     description: Admin control functions for ActivityTracker
