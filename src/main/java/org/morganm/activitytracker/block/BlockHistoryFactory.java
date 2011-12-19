@@ -20,4 +20,6 @@ public class BlockHistoryFactory {
 		
 		return null;
 	}
+	
+	public static BlockHistoryCache getBlockHistoryCache() { return cache; }
 }

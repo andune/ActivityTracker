@@ -34,6 +34,7 @@ import org.morganm.activitytracker.LogManager;
 import org.morganm.activitytracker.TrackerManager;
 import org.morganm.activitytracker.util.Debug;
 import org.morganm.activitytracker.util.General;
+import org.morganm.activitytracker.util.PlayerUtil;
 
 /**
  * @author morganm
@@ -68,8 +69,9 @@ public class MyPlayerListener extends PlayerListener {
 		if( !trackerManager.isTracked(event.getPlayer()) )
 			return;
 		
+		boolean newPlayer = PlayerUtil.getInstance().isNewPlayer(playerName);
 		Log log = logManager.getLog(playerName);
-		log.logMessage("player logged in");
+		log.logMessage("player logged in" + (newPlayer ? " (NEW PLAYER)" : ""));
 	}
 	
 	@Override

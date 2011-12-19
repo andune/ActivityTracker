@@ -13,20 +13,23 @@ import org.morganm.activitytracker.ActivityTracker;
 import org.morganm.activitytracker.Log;
 import org.morganm.activitytracker.LogManager;
 import org.morganm.activitytracker.TrackerManager;
+import org.morganm.activitytracker.util.General;
 
 /**
  * @author morganm
  *
  */
 public class MyEntityListener extends EntityListener {
-	private ActivityTracker plugin;
-	private TrackerManager trackerManager;
-	private LogManager logManager;
+	private final ActivityTracker plugin;
+	private final TrackerManager trackerManager;
+	private final LogManager logManager;
+	private final General util;
 	
 	public MyEntityListener(ActivityTracker plugin) {
 		this.plugin = plugin;
 		this.trackerManager = this.plugin.getTrackerManager();
 		this.logManager = this.plugin.getLogManager();
+		this.util = General.getInstance();
 	}
 
 	@Override
@@ -58,14 +61,14 @@ public class MyEntityListener extends EntityListener {
 			String playerName = p.getName();
 			
 			Log log = logManager.getLog(playerName);
-			log.logMessage("player died at location "+p.getLocation()+", killer="+killerE);
+			log.logMessage("player died at location "+util.shortLocationString(p.getLocation())+", killer="+killerE);
 		}
 		// this player did the killing
 		else if( killerPlayer != null ) {
 			String playerName = killerPlayer.getName();
 			
 			Log log = logManager.getLog(playerName);
-			log.logMessage("player killed "+e+" at location "+e.getLocation());
+			log.logMessage("player killed "+e+" at location "+util.shortLocationString(e.getLocation()));
 			
 		}
 	}

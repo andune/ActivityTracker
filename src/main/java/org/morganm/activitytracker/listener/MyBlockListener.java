@@ -22,9 +22,9 @@ import org.morganm.activitytracker.util.Debug;
  *
  */
 public class MyBlockListener extends BlockListener {
-	private ActivityTracker plugin;
-	private BlockTracker tracker;
-	private TrackerManager trackerManager;
+	private final ActivityTracker plugin;
+	private final BlockTracker tracker;
+	private final TrackerManager trackerManager;
 	private final Debug debug;
 	
 	public MyBlockListener(ActivityTracker plugin) {

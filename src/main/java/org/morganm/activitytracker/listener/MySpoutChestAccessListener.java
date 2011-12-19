@@ -10,6 +10,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.getspout.spoutapi.event.inventory.InventoryCloseEvent;
+import org.getspout.spoutapi.event.inventory.InventoryCraftEvent;
 import org.getspout.spoutapi.event.inventory.InventoryListener;
 import org.getspout.spoutapi.event.inventory.InventoryOpenEvent;
 import org.morganm.activitytracker.ActivityTracker;
@@ -92,5 +93,28 @@ public class MySpoutChestAccessListener extends InventoryListener {
 		// blockid 58 == crafting table, so this code ignores those. -morganm
 		if (!event.isCancelled() && event.getLocation() != null && event.getLocation().getBlock().getTypeId() != 58)
 			containers.put(event.getPlayer(), util.compressInventory(event.getInventory().getContents()));
+	}
+	
+	/** Log crafting events as well.
+	 * 
+	 * @author morganm
+	 */
+	@Override
+	public void onInventoryCraft(InventoryCraftEvent event) {
+		final Location l = event.getLocation();
+		if(!event.isCancelled() && l != null) {
+			final Player player = event.getPlayer();
+			if( !trackerManager.isTracked(player) )
+				return;
+			
+			ItemStack[] contents = event.getInventory().getContents();
+			if( contents != null ) {
+				final Log log = logManager.getLog(player);
+				for(ItemStack item : contents) {
+					if( item != null )
+						log.logMessage("crafted item "+item+" at location {"+util.shortLocationString(l)+"}");
+				}
+			}
+		}
 	}
 }

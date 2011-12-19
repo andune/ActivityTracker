@@ -24,6 +24,7 @@ public class BlockLogger implements Runnable {
 	private final BlockTracker tracker;
 	private final LogManager logManager;
 	private final Debug debug;
+	private final BlockHistoryCache blockHistoryCache;
 	private BlockHistoryManager blockHistoryManager;
 	private boolean isCanceled = false;
 	
@@ -32,6 +33,7 @@ public class BlockLogger implements Runnable {
 		this.tracker = this.plugin.getBlockTracker();
 		this.logManager = this.plugin.getLogManager();
 		this.blockHistoryManager = BlockHistoryFactory.getBlockHistoryManager(plugin);
+		this.blockHistoryCache = BlockHistoryFactory.getBlockHistoryCache();
 		this.debug = Debug.getInstance();
 	}
 	
@@ -85,6 +87,11 @@ public class BlockLogger implements Runnable {
 						+", blockType="+bc.type
 						+", blockData="+bc.data
 					);
+
+				// store the object in the cache, this saves us a lookup later and
+				// also makes sure the cache doesn't contain stale data for this location
+				BlockHistory bh = new BlockHistory(bc.playerName, bc.type.getId(), bc.getLocation());
+				blockHistoryCache.storeCacheObject(bh);
 			}
 			else if( bc.eventType == Type.SIGN_CHANGE ) {
 				// record sign data, if any
