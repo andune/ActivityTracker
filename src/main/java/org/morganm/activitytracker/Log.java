@@ -12,30 +12,38 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.logging.Logger;
 
+import org.morganm.activitytracker.util.PermissionSystem;
+
 /** Class that actually handles the logging activity.
  * 
  * @author morganm
  *
  */
 public class Log {
-	// TODO: externalize to config
-	private static final String LOG_DIR = "plugins/ActivityTracker/logs";
 	private static final long FLUSH_FREQUENCY_MILLIS = 5000;
 	
 	private static final DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM);
 	private static final Logger log = ActivityTracker.log;
 	private static final String logPrefix = ActivityTracker.logPrefix;
 	
-//	private ActivityTracker plugin;
-	private String playerName;
+	private final ActivityTracker plugin;
+	private final String playerName;
+	private String logDir;
+	private boolean logDirPerGroup = false; 
 	private File file;
 	private Writer writer;
 	
 	private long lastFlush;
 	
 	public Log(ActivityTracker plugin, String playerName) {
-//		this.plugin = plugin;
+		this.plugin = plugin;
 		this.playerName = playerName;
+		loadConfig();
+	}
+	
+	public void loadConfig() {
+		this.logDir = plugin.getConfig().getString("logDir");
+		this.logDirPerGroup = plugin.getConfig().getBoolean("logDirPerGroup");
 	}
 	
 	public void init() throws IOException {
@@ -47,11 +55,23 @@ public class Log {
 			writer = null;
 		}
 		
-		File logDir = new File(LOG_DIR);
-		if( !logDir.exists() )
-			logDir.mkdirs();
+		File fLogDir = null;
+		if( logDirPerGroup ) {
+			String group = PermissionSystem.getInstance().getPlayerGroup(null, playerName);
+			if( group != null ) {
+				fLogDir = new File(logDir + "/" + group);
+				file = new File(logDir+"/"+group+"/"+playerName+".log");
+			}
+		}
 		
-		file = new File(LOG_DIR+"/"+playerName+".log");
+		if( file == null ) 
+			file = new File(logDir+"/"+playerName+".log");
+		if( fLogDir == null )
+			fLogDir = new File(logDir);
+		
+		if( !fLogDir.exists() )
+			fLogDir.mkdirs();
+		
 		writer = new BufferedWriter(new FileWriter(file, true), 16384);
 	}
 	

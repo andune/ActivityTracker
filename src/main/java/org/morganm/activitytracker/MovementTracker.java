@@ -23,21 +23,26 @@ import org.morganm.activitytracker.util.General;
  */
 public class MovementTracker implements Runnable {
 	private final ActivityTracker plugin;
-	private final TrackerManager trackerMgr;
 	private final LogManager logManager;
 	private final HashMap<Player,Location> positions = new HashMap<Player,Location>(10);
 	private final Debug debug;
 	private final General util;
+	private final TrackerManager trackerMgr;
+	private int taskId;
 	
 	private final DecimalFormat df = new DecimalFormat("#.#");
 	
-	public MovementTracker(ActivityTracker plugin) {
+	public MovementTracker(final ActivityTracker plugin) {
 		this.plugin = plugin;
 		this.trackerMgr = this.plugin.getTrackerManager();
 		this.logManager = this.plugin.getLogManager();
 		this.debug = Debug.getInstance();
 		this.util = General.getInstance();
-	}
+		Debug.getInstance().debug("MovementTracker constructur: trackerMgr=",trackerMgr);
+}
+	
+	public void setTaskId(int id) { this.taskId = id; }
+	public int getTaskId() { return taskId; }
 	
 	public void playerLogout(Player p) {
 		positions.remove(p);

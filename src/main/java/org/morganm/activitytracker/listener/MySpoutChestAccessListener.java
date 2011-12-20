@@ -63,7 +63,9 @@ public class MySpoutChestAccessListener extends InventoryListener {
 			Log log = logManager.getLog(player);
 			
 			BlockHistory bh = blockHistoryManager.getBlockHistory(l);
-			String blockOwner = bh.getOwner();
+			String blockOwner = null;
+			if( bh != null )
+				blockOwner = bh.getOwner();
 			String ownerString = null;
 			
 			if( player.getName().equals(blockOwner) )

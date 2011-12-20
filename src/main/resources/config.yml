@@ -1,3 +1,13 @@
+logDir: plugins/ActivityTracker/logs
+
+# use the player's primary group as a subdirectory?
+logDirPerGroup: false
+
+logMovement: true
+
+# in seconds
+logMovementInterval: 5
+
 trackedPermissions:
 - group.GuestLogin
 

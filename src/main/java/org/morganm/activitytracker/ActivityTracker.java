@@ -101,10 +101,10 @@ public class ActivityTracker extends JavaPlugin {
 			log.info(logPrefix+ "Using Spout API to log chest access");
 		}
 		
-		movementTracker = new MovementTracker(this);
-		getServer().getScheduler().scheduleAsyncRepeatingTask(this, movementTracker, 100, 100);	// every 5 seconds
 		blockLogger = new BlockLogger(this);
 		getServer().getScheduler().scheduleAsyncRepeatingTask(this, blockLogger, 100, 100);		// every 5 seconds
+		
+		postConfig();
 		
 		// cover the case where we are reloaded live, by making sure all online
 		// players (if any) go through the tracker check
@@ -146,7 +146,28 @@ public class ActivityTracker extends JavaPlugin {
 		Debug.getInstance().init(log, logPrefix, false);
 		Debug.getInstance().setDebug(getConfig().getBoolean("devDebug", false), Level.FINEST);
 		Debug.getInstance().setDebug(getConfig().getBoolean("debug", false));
-}
+	}
+	
+	public void liveReloadConfig() {
+		super.reloadConfig();
+		postConfig();
+	}
+
+	/** Things to do after the config has been loaded/reloaded.
+	 */
+	public void postConfig() {
+		// cancel old movementTracker job, if any
+		if( movementTracker != null )
+			getServer().getScheduler().cancelTask(movementTracker.getTaskId());
+		
+		if( getConfig().getBoolean("logMovement") ) {
+			int seconds = getConfig().getInt("logMovementInterval");
+			if( movementTracker == null )
+				movementTracker = new MovementTracker(this);
+			int taskId = getServer().getScheduler().scheduleAsyncRepeatingTask(this, movementTracker, seconds*20, seconds*20);
+			movementTracker.setTaskId(taskId);
+		}
+	}
 	
 	public TrackerManager getTrackerManager() { return trackerManager; }
 	public LogManager getLogManager() { return logManager; }
