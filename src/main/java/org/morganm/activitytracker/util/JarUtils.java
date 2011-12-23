@@ -18,6 +18,7 @@ import org.bukkit.plugin.java.JavaPlugin;
  *
  */
 public class JarUtils {
+	// class version: 5
 	private final Logger log;
 	private final String logPrefix;
 	private JavaPlugin plugin;

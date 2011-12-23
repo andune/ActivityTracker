@@ -27,6 +27,7 @@ import com.sk89q.wepif.PermissionsResolverManager;
  *
  */
 public class PermissionSystem {
+	// class version: 5
 	public static final int SUPERPERMS = 0x00;		// default
 	public static final int VAULT = 0x01;
 	public static final int WEPIF = 0x02;

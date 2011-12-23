@@ -16,6 +16,7 @@ import org.bukkit.inventory.ItemStack;
  *
  */
 public class General {
+	// class version: 5
 	private static General instance;
 	
 	private General() {}

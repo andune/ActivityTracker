@@ -13,6 +13,7 @@ import java.util.logging.Logger;
  *
  */
 public class Debug {
+	// class version: 5
 	private static Debug instance = null;
 	
 	private Logger log;
