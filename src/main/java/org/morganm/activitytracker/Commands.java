@@ -8,6 +8,7 @@ import java.util.Set;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.morganm.activitytracker.util.PermissionSystem;
 
@@ -87,9 +88,9 @@ public class Commands {
 			return true;
 		}
 		else if( "tracklist".equals(cmdName) ) {
-			Set<Player> trackedPlayers = plugin.getTrackerManager().getTrackedPlayers();
+			Set<HumanEntity> trackedPlayers = plugin.getTrackerManager().getTrackedPlayers();
 			StringBuilder sb = new StringBuilder();
-			for(Player p : trackedPlayers) {
+			for(HumanEntity p : trackedPlayers) {
 				if( sb.length() > 0 )
 					sb.append(", ");
 				sb.append(p.getName());

@@ -6,7 +6,6 @@ package org.morganm.activitytracker.block;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.event.Event;
 
 /** Lightweight non-OOP object for performance tracking of block changes.
  * 
@@ -14,8 +13,13 @@ import org.bukkit.event.Event;
  *
  */
 public class BlockChange {
+	public enum Type {
+		BLOCK_PLACE,
+		BLOCK_BREAK,
+		SIGN_CHANGE
+	};
 	// should only be BLOCK_PLACE or BLOCK_BREAK
-	public Event.Type eventType;
+	public Type eventType;
 	
 	public String playerName;
 	public long time;		// time of the event

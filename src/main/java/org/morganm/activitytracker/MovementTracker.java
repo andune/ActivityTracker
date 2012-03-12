@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Set;
 
 import org.bukkit.Location;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.morganm.activitytracker.util.Debug;
 import org.morganm.activitytracker.util.General;
@@ -24,7 +25,7 @@ import org.morganm.activitytracker.util.General;
 public class MovementTracker implements Runnable {
 	private final ActivityTracker plugin;
 	private final LogManager logManager;
-	private final HashMap<Player,Location> positions = new HashMap<Player,Location>(10);
+	private final HashMap<HumanEntity,Location> positions = new HashMap<HumanEntity,Location>(10);
 	private final Debug debug;
 	private final General util;
 	private final TrackerManager trackerMgr;
@@ -49,8 +50,8 @@ public class MovementTracker implements Runnable {
 	}
 	
 	public void run() {
-		Set<Player> players = trackerMgr.getTrackedPlayers();
-		for(Player p : players) {
+		Set<HumanEntity> players = trackerMgr.getTrackedPlayers();
+		for(HumanEntity p : players) {
 			Location curPos = p.getLocation();
 			Location prevPos = positions.get(p);
 			if( prevPos == null ) {

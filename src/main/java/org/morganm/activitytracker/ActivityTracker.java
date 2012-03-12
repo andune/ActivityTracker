@@ -10,16 +10,14 @@ import java.util.logging.Logger;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event.Priority;
-import org.bukkit.event.Event.Type;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.morganm.activitytracker.block.BlockLogger;
 import org.morganm.activitytracker.block.BlockTracker;
 import org.morganm.activitytracker.listener.MyBlockListener;
 import org.morganm.activitytracker.listener.MyEntityListener;
+import org.morganm.activitytracker.listener.MyInventoryListener;
 import org.morganm.activitytracker.listener.MyPlayerListener;
-import org.morganm.activitytracker.listener.MySpoutChestAccessListener;
 import org.morganm.activitytracker.util.Debug;
 import org.morganm.activitytracker.util.JarUtils;
 import org.morganm.activitytracker.util.PermissionSystem;
@@ -42,9 +40,6 @@ public class ActivityTracker extends JavaPlugin {
 	private TrackerManager trackerManager;
 	private LogManager logManager;
 	private BlockTracker blockTracker;		// circular buffer to track broken blocks
-	private MyBlockListener blockListener;	// block listener to push block breaks into buffer
-	private MyPlayerListener playerListener;// player listener to log player activity
-	private MyEntityListener entityListener;// entity listener to log player deaths
 	private MovementTracker movementTracker;// movement tracker, called on a schedule to track movement
 	private BlockLogger blockLogger;		// runnable called on a schedule to log block breaks
 	private Commands commandProcessor;
@@ -68,38 +63,15 @@ public class ActivityTracker extends JavaPlugin {
 		commandProcessor = new Commands(this);
 		
 		PluginManager pm = getServer().getPluginManager();
-		blockListener = new MyBlockListener(this);
-		pm.registerEvent(Type.BLOCK_BREAK, blockListener, Priority.Monitor, this);
-		pm.registerEvent(Type.BLOCK_PLACE, blockListener, Priority.Monitor, this);
-		pm.registerEvent(Type.SIGN_CHANGE, blockListener, Priority.Monitor, this);
+		pm.registerEvents(new MyBlockListener(this), this);
+		pm.registerEvents(new MyPlayerListener(this), this);
+		pm.registerEvents(new MyEntityListener(this), this);
+		pm.registerEvents(new MyInventoryListener(this), this);
 		
-		playerListener = new MyPlayerListener(this);
-		pm.registerEvent(Type.PLAYER_BUCKET_FILL, playerListener, Priority.Monitor, this);
-		pm.registerEvent(Type.PLAYER_BUCKET_EMPTY, playerListener, Priority.Monitor, this);
-		pm.registerEvent(Type.PLAYER_CHANGED_WORLD, playerListener, Priority.Monitor, this);
-		pm.registerEvent(Type.PLAYER_CHAT, playerListener, Priority.Monitor, this);
-		pm.registerEvent(Type.PLAYER_DROP_ITEM, playerListener, Priority.Monitor, this);
-		pm.registerEvent(Type.PLAYER_INTERACT, playerListener, Priority.Monitor, this);
-		pm.registerEvent(Type.PLAYER_INTERACT_ENTITY, playerListener, Priority.Monitor, this);
-		pm.registerEvent(Type.PLAYER_PICKUP_ITEM, playerListener, Priority.Monitor, this);
-		pm.registerEvent(Type.PLAYER_PORTAL, playerListener, Priority.Monitor, this);
-		pm.registerEvent(Type.PLAYER_QUIT, playerListener, Priority.Monitor, this);
-		pm.registerEvent(Type.PLAYER_JOIN, playerListener, Priority.Monitor, this);
-		pm.registerEvent(Type.PLAYER_KICK, playerListener, Priority.Monitor, this);
-		pm.registerEvent(Type.PLAYER_RESPAWN, playerListener, Priority.Monitor, this);
-		pm.registerEvent(Type.PLAYER_TELEPORT, playerListener, Priority.Monitor, this);
-		pm.registerEvent(Type.PLAYER_COMMAND_PREPROCESS, playerListener, Priority.Monitor, this);
-		
-		// event type exists, but no Bukkit method call exists for this event yet
-//		pm.registerEvent(Type.PLAYER_ITEM_HELD, playerListener, Priority.Monitor, this);
-		
-		entityListener = new MyEntityListener(this);
-		pm.registerEvent(Type.ENTITY_DEATH, entityListener, Priority.Monitor, this);
-		
-		if (pm.isPluginEnabled("Spout")) {
-			pm.registerEvent(Type.CUSTOM_EVENT, new MySpoutChestAccessListener(this), Priority.Monitor, this);
-			log.info(logPrefix+ "Using Spout API to log chest access");
-		}
+//		if (pm.isPluginEnabled("Spout")) {
+//			pm.registerEvent(Type.CUSTOM_EVENT, new MySpoutChestAccessListener(this), Priority.Monitor, this);
+//			log.info(logPrefix+ "Using Spout API to log chest access");
+//		}
 		
 		blockLogger = new BlockLogger(this);
 		getServer().getScheduler().scheduleAsyncRepeatingTask(this, blockLogger, 100, 100);		// every 5 seconds
@@ -167,6 +139,10 @@ public class ActivityTracker extends JavaPlugin {
 			int taskId = getServer().getScheduler().scheduleAsyncRepeatingTask(this, movementTracker, seconds*20, seconds*20);
 			movementTracker.setTaskId(taskId);
 		}
+	}
+	
+	public boolean isPickupDropLogEnabled() {
+		return getConfig().getBoolean("allPickupDropLogging", false);
 	}
 	
 	public TrackerManager getTrackerManager() { return trackerManager; }

@@ -18,7 +18,7 @@ public class BlockHistoryFactory {
 		if( p != null )
 			return new BlockHistoryLogBlock(plugin, cache);
 		
-		return null;
+		return new BlockHistoryNoOp();
 	}
 	
 	public static BlockHistoryCache getBlockHistoryCache() { return cache; }

@@ -7,7 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.bukkit.entity.Player;
+import org.bukkit.entity.HumanEntity;
 import org.morganm.activitytracker.util.Debug;
 import org.morganm.activitytracker.util.PermissionSystem;
 
@@ -19,7 +19,7 @@ import org.morganm.activitytracker.util.PermissionSystem;
 public class TrackerManager {
 	private ActivityTracker plugin;
 	private PermissionSystem permHandler;
-	private final HashSet<Player> trackedPlayers = new HashSet<Player>(10);
+	private final HashSet<HumanEntity> trackedPlayers = new HashSet<HumanEntity>(10);
 	private List<String> trackedPermissions;
 	private Debug debug;
 	
@@ -38,14 +38,14 @@ public class TrackerManager {
 			trackedPermissions = null;
 	}
 	
-	public Set<Player> getTrackedPlayers() { return trackedPlayers; }
+	public Set<HumanEntity> getTrackedPlayers() { return trackedPlayers; }
 	
 	/** Called when a player logs in to give this class the oportunity to determine whether
 	 * it should start tracking them or not.
 	 * 
 	 * @param playerName
 	 */
-	public void playerLogin(Player p) {
+	public void playerLogin(HumanEntity p) {
 		debug.debug("playerLogin(): ",p);
 		if( shouldBeTracked(p) )
 			trackedPlayers.add(p);
@@ -55,22 +55,22 @@ public class TrackerManager {
 	 * 
 	 * @param p
 	 */
-	public void trackPlayer(Player p) {
+	public void trackPlayer(HumanEntity p) {
 		trackedPlayers.add(p);
 	}
 	/** Manual way to specify a player to stop tracking.
 	 * 
 	 * @param p
 	 */
-	public void unTrackPlayer(Player p) {
+	public void unTrackPlayer(HumanEntity p) {
 		trackedPlayers.remove(p);
 	}
 	
-	public void playerLogout(Player p) {
+	public void playerLogout(HumanEntity p) {
 		trackedPlayers.remove(p);
 	}
 	
-	private boolean shouldBeTracked(Player p) {
+	private boolean shouldBeTracked(HumanEntity p) {
 		boolean shouldBeTracked = false;
 		
 		if( trackedPermissions != null ) {
@@ -87,7 +87,7 @@ public class TrackerManager {
 		return shouldBeTracked;
 	}
 	
-	public boolean isTracked(Player p) {
+	public boolean isTracked(HumanEntity p) {
 		if( p == null )
 			return false;
 		

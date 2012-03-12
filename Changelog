@@ -1,3 +1,9 @@
+v0.5 - March 11, 2012
+* R6 compatibility
+* no longer requires Spout for inventory event logging
+* new config option "allPickupDropLogging" which logs all item pickup/drops to
+a single log file for easy tracking of who dropped or picked up items.
+
 v0.4 - December 18, 2011
 * added chest inventory logging (requires Spout)
 * refactored block history to use interface so future interfaces can be added

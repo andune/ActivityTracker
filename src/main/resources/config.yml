@@ -3,12 +3,18 @@ logDir: plugins/ActivityTracker/logs
 # use the player's primary group as a subdirectory?
 logDirPerGroup: false
 
+# log all inventory pickup/drop events to a central log?
+allPickupDropLogging: true
+
 logMovement: true
 
 # in seconds
 logMovementInterval: 5
 
+# you can choose whatever permissions you want, these are
+# just examples
 trackedPermissions:
-- group.GuestLogin
+- activitytracker.tracked
+- group.Guest
 
 debug: false

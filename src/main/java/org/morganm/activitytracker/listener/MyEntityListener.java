@@ -5,10 +5,12 @@ package org.morganm.activitytracker.listener;
 
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.EntityListener;
 import org.morganm.activitytracker.ActivityTracker;
 import org.morganm.activitytracker.Log;
 import org.morganm.activitytracker.LogManager;
@@ -19,7 +21,7 @@ import org.morganm.activitytracker.util.General;
  * @author morganm
  *
  */
-public class MyEntityListener extends EntityListener {
+public class MyEntityListener implements Listener {
 	private final ActivityTracker plugin;
 	private final TrackerManager trackerManager;
 	private final LogManager logManager;
@@ -32,7 +34,7 @@ public class MyEntityListener extends EntityListener {
 		this.util = General.getInstance();
 	}
 
-	@Override
+	@EventHandler(priority=EventPriority.MONITOR)
 	public void onEntityDeath(EntityDeathEvent event) {
 		Entity e = event.getEntity();
 		Entity killerE = null;

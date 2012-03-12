@@ -3,12 +3,15 @@
  */
 package org.morganm.activitytracker.listener;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
 
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event.Type;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerBucketFillEvent;
@@ -21,7 +24,6 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
-import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -40,7 +42,7 @@ import org.morganm.activitytracker.util.PlayerUtil;
  * @author morganm
  *
  */
-public class MyPlayerListener extends PlayerListener {
+public class MyPlayerListener implements Listener {
 	private final HashSet<Integer> leftClickRecord = new HashSet<Integer>(20);
 	private ActivityTracker plugin;
 	private TrackerManager trackerManager;
@@ -48,6 +50,7 @@ public class MyPlayerListener extends PlayerListener {
 	private Debug debug;
 	private General util;
 	private HashMap<String, String> banReasons = new HashMap<String, String>(20);
+	private Log pickupDropLog;
 	
 	public MyPlayerListener(ActivityTracker plugin) {
 		this.plugin = plugin;
@@ -59,7 +62,12 @@ public class MyPlayerListener extends PlayerListener {
 		initializeLeftClickRecordMap();
 	}
 	
-	@Override
+	private void initPickupDropLog() {
+		final String logDir = plugin.getConfig().getString("logDir");
+		pickupDropLog = new Log(plugin, new File(logDir+"/pickupAndDrop.log"));
+	}
+	
+	@EventHandler(priority=EventPriority.MONITOR)
 	public void onPlayerJoin(PlayerJoinEvent event) {
 		debug.debug("onPlayerJoin: event=",event);
 		
@@ -74,7 +82,7 @@ public class MyPlayerListener extends PlayerListener {
 		log.logMessage("player logged in" + (newPlayer ? " (NEW PLAYER)" : ""));
 	}
 	
-	@Override
+	@EventHandler(priority=EventPriority.MONITOR)
 	public void onPlayerQuit(PlayerQuitEvent event) {
 		if( !trackerManager.isTracked(event.getPlayer()) )
 			return;
@@ -88,7 +96,7 @@ public class MyPlayerListener extends PlayerListener {
 		logManager.closeLog(playerName);
 	}
 	
-	@Override
+	@EventHandler(priority=EventPriority.MONITOR)
 	public void onPlayerKick(PlayerKickEvent event) {
 		if( event.isCancelled() )
 			return;
@@ -105,7 +113,7 @@ public class MyPlayerListener extends PlayerListener {
 		logManager.closeLog(playerName);
 	}
 	
-	@Override
+	@EventHandler(priority=EventPriority.MONITOR)
 	public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
 		// we don't care about permissions checks, we're just capturing the reason
 		// for future use. If the person can't actually kick/ban, then this won't
@@ -128,7 +136,7 @@ public class MyPlayerListener extends PlayerListener {
 		log.logMessage("player command (pre-process): "+event.getMessage());
 	}
 	
-	@Override
+	@EventHandler(priority=EventPriority.MONITOR)
 	public void onItemHeldChange(PlayerItemHeldEvent event) {
 		if( !trackerManager.isTracked(event.getPlayer()) )
 			return;
@@ -146,7 +154,7 @@ public class MyPlayerListener extends PlayerListener {
 			);
 	}
 	
-	@Override
+	@EventHandler(priority=EventPriority.MONITOR)
 	public void onPlayerBucketEmpty(PlayerBucketEmptyEvent event) {
 		if( event.isCancelled() )
 			return;
@@ -159,7 +167,7 @@ public class MyPlayerListener extends PlayerListener {
 				+util.shortLocationString(event.getBlockClicked().getLocation()));
 	}
 	
-	@Override
+	@EventHandler(priority=EventPriority.MONITOR)
 	public void onPlayerBucketFill(PlayerBucketFillEvent event) {
 		if( event.isCancelled() )
 			return;
@@ -173,7 +181,7 @@ public class MyPlayerListener extends PlayerListener {
 				+", blockType="+event.getBlockClicked().getType());
 	}
 	
-	@Override
+	@EventHandler(priority=EventPriority.MONITOR)
 	public void onPlayerChangedWorld(PlayerChangedWorldEvent event) {
 		if( !trackerManager.isTracked(event.getPlayer()) )
 			return;
@@ -187,7 +195,7 @@ public class MyPlayerListener extends PlayerListener {
 		log.logMessage("changed world to "+to+" from "+from);
 	}
 	
-	@Override
+	@EventHandler(priority=EventPriority.MONITOR)
 	public void onPlayerChat(PlayerChatEvent event) {
 		// we ignore isCancelled, since HeroChat, at least, sets this when it processes
 		// a chat. So we just log every chat that comes through, cancelled or not.
@@ -201,10 +209,20 @@ public class MyPlayerListener extends PlayerListener {
 		log.logMessage("chat: "+event.getMessage());
 	}
 	
-	@Override
+	@EventHandler(priority=EventPriority.MONITOR)
 	public void onPlayerDropItem(PlayerDropItemEvent event) {
 		if( event.isCancelled() )
 			return;
+
+		if( plugin.isPickupDropLogEnabled() ) {
+			if( pickupDropLog == null )
+				initPickupDropLog();
+			
+			pickupDropLog.logMessage("player " + event.getPlayer().getName()
+					+" dropped item "+event.getItemDrop().getItemStack()+" at location "
+					+ util.shortLocationString(event.getPlayer().getLocation()));
+		}
+
 		if( !trackerManager.isTracked(event.getPlayer()) )
 			return;
 		String playerName = event.getPlayer().getName();
@@ -214,7 +232,7 @@ public class MyPlayerListener extends PlayerListener {
 				+util.shortLocationString(event.getPlayer().getLocation()));
 	}
 	
-	@Override
+	@EventHandler(priority=EventPriority.MONITOR)
 	public void onPlayerInteract(PlayerInteractEvent event) {
 		if( event.isCancelled() )
 			return;
@@ -232,7 +250,7 @@ public class MyPlayerListener extends PlayerListener {
 		sb.append("playerInteract: action=");
 		sb.append(event.getAction());
 		sb.append(", eventType=");
-		sb.append(event.getType());
+		sb.append(event.getClass().getSimpleName());
 		Block b = event.getClickedBlock();
 		if( b != null ) {
 			sb.append(", clickedBlock=");
@@ -250,7 +268,7 @@ public class MyPlayerListener extends PlayerListener {
 		log.logMessage(sb.toString());
 	}
 	
-	@Override
+	@EventHandler(priority=EventPriority.MONITOR)
 	public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
 		if( event.isCancelled() )
 			return;
@@ -260,16 +278,26 @@ public class MyPlayerListener extends PlayerListener {
 		
 		Log log = logManager.getLog(playerName);
 		log.logMessage("playerInteract: entity="+event.getRightClicked()
-				+", eventType="+event.getType()
-				+", eventName="+(event.getType() == Type.CUSTOM_EVENT ? event.getEventName() : "null")
+				+", eventType="+event.getClass().getSimpleName()
+				+", eventName="+event.getEventName()
 //				+", isCancelled="+event.isCancelled()
 			);
 	}
 	
-	@Override
+	@EventHandler(priority=EventPriority.MONITOR)
 	public void onPlayerPickupItem(PlayerPickupItemEvent event) {
 		if( event.isCancelled() )
 			return;
+
+		if( plugin.isPickupDropLogEnabled() ) {
+			if( pickupDropLog == null )
+				initPickupDropLog();
+			
+			pickupDropLog.logMessage("player " + event.getPlayer().getName()
+					+" picked up item "+event.getItem().getItemStack()+" at location "
+					+ util.shortLocationString(event.getPlayer().getLocation()));
+		}
+		
 		if( !trackerManager.isTracked(event.getPlayer()) )
 			return;
 		String playerName = event.getPlayer().getName();
@@ -279,7 +307,7 @@ public class MyPlayerListener extends PlayerListener {
 				+ util.shortLocationString(event.getPlayer().getLocation()));
 	}
 	
-	@Override
+	@EventHandler(priority=EventPriority.MONITOR)
 	public void onPlayerPortal(PlayerPortalEvent event) {
 		if( event.isCancelled() )
 			return;
@@ -292,7 +320,7 @@ public class MyPlayerListener extends PlayerListener {
 				+" from location "+util.shortLocationString(event.getFrom()));
 	}
 	
-	@Override
+	@EventHandler(priority=EventPriority.MONITOR)
 	public void onPlayerRespawn(PlayerRespawnEvent event) {
 		if( !trackerManager.isTracked(event.getPlayer()) )
 			return;
@@ -302,7 +330,7 @@ public class MyPlayerListener extends PlayerListener {
 		log.logMessage("player respawned at location "+util.shortLocationString(event.getRespawnLocation()));
 	}
 	
-	@Override
+	@EventHandler(priority=EventPriority.MONITOR)
 	public void onPlayerTeleport(PlayerTeleportEvent event) {
 		if( event.isCancelled() )
 			return;

@@ -7,8 +7,10 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockListener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.morganm.activitytracker.ActivityTracker;
@@ -21,7 +23,7 @@ import org.morganm.activitytracker.util.Debug;
  * @author morganm
  *
  */
-public class MyBlockListener extends BlockListener {
+public class MyBlockListener implements Listener {
 	private final ActivityTracker plugin;
 	private final BlockTracker tracker;
 	private final TrackerManager trackerManager;
@@ -34,7 +36,7 @@ public class MyBlockListener extends BlockListener {
 		this.debug = Debug.getInstance();
 	}
 	
-	@Override
+	@EventHandler(priority=EventPriority.MONITOR)
 	public void onBlockBreak(BlockBreakEvent event) {
 		if( event.isCancelled() )
 			return;
@@ -46,7 +48,7 @@ public class MyBlockListener extends BlockListener {
 
 		bc.playerName = event.getPlayer().getName();
 		bc.time = System.currentTimeMillis();
-	    bc.eventType = event.getType();
+	    bc.eventType = BlockChange.Type.BLOCK_BREAK;
 		bc.x = b.getX();
 		bc.y = b.getY();
 		bc.z = b.getZ();
@@ -56,7 +58,7 @@ public class MyBlockListener extends BlockListener {
 		bc.signData = null;
 	}
 	
-	@Override
+	@EventHandler(priority=EventPriority.MONITOR)
 	public void onBlockPlace(BlockPlaceEvent event) {
 		if( event.isCancelled() )
 			return;
@@ -68,7 +70,7 @@ public class MyBlockListener extends BlockListener {
 		
 		bc.playerName = event.getPlayer().getName();
 		bc.time = System.currentTimeMillis();
-	    bc.eventType = event.getType();
+	    bc.eventType = BlockChange.Type.BLOCK_PLACE;
 		bc.x = b.getX();
 		bc.y = b.getY();
 		bc.z = b.getZ();
@@ -79,7 +81,7 @@ public class MyBlockListener extends BlockListener {
 		bc.signData = null;
 	}
 	
-	@Override
+	@EventHandler(priority=EventPriority.MONITOR)
 	public void onSignChange(SignChangeEvent event) {
 		if( event.isCancelled() )
 			return;
@@ -91,7 +93,7 @@ public class MyBlockListener extends BlockListener {
 		
 		bc.playerName = event.getPlayer().getName();
 		bc.time = System.currentTimeMillis();
-	    bc.eventType = event.getType();
+	    bc.eventType = BlockChange.Type.SIGN_CHANGE;
 		bc.x = b.getX();
 		bc.y = b.getY();
 		bc.z = b.getZ();

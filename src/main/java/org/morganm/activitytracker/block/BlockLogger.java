@@ -6,7 +6,6 @@ package org.morganm.activitytracker.block;
 import java.util.logging.Logger;
 
 import org.bukkit.Location;
-import org.bukkit.event.Event.Type;
 import org.morganm.activitytracker.ActivityTracker;
 import org.morganm.activitytracker.Log;
 import org.morganm.activitytracker.LogManager;
@@ -54,7 +53,7 @@ public class BlockLogger implements Runnable {
 			Log log = logManager.getLog(bc.playerName);
 			Location l = bc.getLocation();
 			
-			if( bc.eventType == Type.BLOCK_BREAK ) {
+			if( bc.eventType == BlockChange.Type.BLOCK_BREAK ) {
 				String blockOwner = "(none)";
 				
 				if( blockHistoryManager != null ) {
@@ -81,7 +80,7 @@ public class BlockLogger implements Runnable {
 						+postMsg
 					);
 			}
-			else if( bc.eventType == Type.BLOCK_PLACE ) {
+			else if( bc.eventType == BlockChange.Type.BLOCK_PLACE ) {
 				log.logMessage(bc.time, "block placed at "
 						+bc.locationString()
 						+", blockType="+bc.type
@@ -93,7 +92,7 @@ public class BlockLogger implements Runnable {
 				BlockHistory bh = new BlockHistory(bc.playerName, bc.type.getId(), bc.getLocation());
 				blockHistoryCache.storeCacheObject(bh);
 			}
-			else if( bc.eventType == Type.SIGN_CHANGE ) {
+			else if( bc.eventType == BlockChange.Type.SIGN_CHANGE ) {
 				// record sign data, if any
 				StringBuilder signData = new StringBuilder();
 				if( bc.signData != null ) {

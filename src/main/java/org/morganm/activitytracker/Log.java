@@ -40,6 +40,12 @@ public class Log {
 		this.playerName = playerName;
 		loadConfig();
 	}
+	public Log(ActivityTracker plugin, File logFile) {
+		this.plugin = plugin;
+		this.playerName = null;
+		this.file = logFile;
+		loadConfig();
+	}
 	
 	public void loadConfig() {
 		this.logDir = plugin.getConfig().getString("logDir");
@@ -56,7 +62,7 @@ public class Log {
 		}
 		
 		File fLogDir = null;
-		if( logDirPerGroup ) {
+		if( file == null && logDirPerGroup ) {
 			String group = PermissionSystem.getInstance().getPlayerGroup(null, playerName);
 			if( group != null ) {
 				fLogDir = new File(logDir + "/" + group);

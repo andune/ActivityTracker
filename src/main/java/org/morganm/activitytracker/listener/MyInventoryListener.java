@@ -7,12 +7,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.bukkit.Location;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.CraftItemEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.ItemStack;
-import org.getspout.spoutapi.event.inventory.InventoryCloseEvent;
-import org.getspout.spoutapi.event.inventory.InventoryCraftEvent;
-import org.getspout.spoutapi.event.inventory.InventoryListener;
-import org.getspout.spoutapi.event.inventory.InventoryOpenEvent;
 import org.morganm.activitytracker.ActivityTracker;
 import org.morganm.activitytracker.Log;
 import org.morganm.activitytracker.LogManager;
@@ -27,7 +30,7 @@ import org.morganm.activitytracker.util.General;
  * @author morganm, Diddiz (original Logblock code)
  *
  */
-public class MySpoutChestAccessListener extends InventoryListener {
+public class MyInventoryListener implements Listener {
 	private final ActivityTracker plugin;
 	private final TrackerManager trackerManager;
 	private final LogManager logManager;
@@ -35,7 +38,7 @@ public class MySpoutChestAccessListener extends InventoryListener {
 	private BlockHistoryManager blockHistoryManager;
 	private final Map<Player, ItemStack[]> containers = new HashMap<Player, ItemStack[]>();
 
-	public MySpoutChestAccessListener(final ActivityTracker plugin) {
+	public MyInventoryListener(final ActivityTracker plugin) {
 		this.plugin = plugin;
 		this.trackerManager = this.plugin.getTrackerManager();
 		this.logManager = this.plugin.getLogManager();
@@ -48,14 +51,17 @@ public class MySpoutChestAccessListener extends InventoryListener {
 	 * 
 	 * @author morganm, Diddiz (original LogBlock code)
 	 */
-	@Override
+	@EventHandler(priority=EventPriority.MONITOR)
 	public void onInventoryClose(InventoryCloseEvent event) {
-		final Location l = event.getLocation();
-		if (event.isCancelled() || l == null)
+		final HumanEntity entity = event.getPlayer();
+		Player player = null;
+		if( entity instanceof Player )
+			player = (Player) entity;
+		if( player == null )
 			return;
-
-		final Player player = event.getPlayer();
-		if( !trackerManager.isTracked(player) )
+		
+		final Location l = entity.getLocation();
+		if( !trackerManager.isTracked(entity) )
 			return;
 
 		final ItemStack[] before = containers.get(player);
@@ -88,34 +94,47 @@ public class MySpoutChestAccessListener extends InventoryListener {
 	/** Record the "before" inventory of the container in memory when the chest is opened,
 	 * so that we can later compare before/after to see what has changed. -morganm
 	 * 
-	 * @author Diddiz
+	 * Original Spout code ignored crafting events, hopefully since Bukkit has a separate
+	 * CraftItemEvent, that will happen automatically for us now.
+	 * 
+	 * @author morganm, Diddiz (original LogBlock code)
 	 */
-	@Override
+	@EventHandler(priority=EventPriority.MONITOR)
 	public void onInventoryOpen(InventoryOpenEvent event) {
-		// blockid 58 == crafting table, so this code ignores those. -morganm
-		if (!event.isCancelled() && event.getLocation() != null && event.getLocation().getBlock().getTypeId() != 58)
-			containers.put(event.getPlayer(), util.compressInventory(event.getInventory().getContents()));
+		final HumanEntity entity = event.getPlayer();
+		Player player = null;
+		if( entity instanceof Player )
+			player = (Player) entity;
+		if( player == null )
+			return;
+		
+		containers.put(player, util.compressInventory(event.getInventory().getContents()));
 	}
 	
 	/** Log crafting events as well.
 	 * 
 	 * @author morganm
 	 */
-	@Override
-	public void onInventoryCraft(InventoryCraftEvent event) {
-		final Location l = event.getLocation();
-		if(!event.isCancelled() && l != null) {
-			final Player player = event.getPlayer();
-			if( !trackerManager.isTracked(player) )
-				return;
+	@EventHandler(priority=EventPriority.MONITOR)
+	public void onInventoryCraft(CraftItemEvent event) {
+		final HumanEntity entity = event.getWhoClicked();
+		Player player = null;
+		if( entity instanceof Player )
+			player = (Player) entity;
+		if( player == null )
+			return;
+
+		if( !trackerManager.isTracked(player) )
+			return;
+
+		final Location l = player.getLocation();
 			
-			ItemStack[] contents = event.getInventory().getContents();
-			if( contents != null ) {
-				final Log log = logManager.getLog(player);
-				for(ItemStack item : contents) {
-					if( item != null )
-						log.logMessage("crafted item "+item+" at location {"+util.shortLocationString(l)+"}");
-				}
+		ItemStack[] contents = event.getInventory().getContents();
+		if( contents != null ) {
+			final Log log = logManager.getLog(player);
+			for(ItemStack item : contents) {
+				if( item != null )
+					log.logMessage("crafted item "+item+" at location {"+util.shortLocationString(l)+"}");
 			}
 		}
 	}
