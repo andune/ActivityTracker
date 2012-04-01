@@ -145,6 +145,10 @@ public class ActivityTracker extends JavaPlugin {
 		return getConfig().getBoolean("allPickupDropLogging", false);
 	}
 	
+	public boolean isDeathItemLogEnabled() {
+		return getConfig().getBoolean("deathItemLogging", false);
+	}
+	
 	public TrackerManager getTrackerManager() { return trackerManager; }
 	public LogManager getLogManager() { return logManager; }
 	public BlockTracker getBlockTracker() { return blockTracker; }

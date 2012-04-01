@@ -10,6 +10,8 @@ allPickupDropLogging: true
 # mining dirt, cobble, sand, etc
 skipCommonSinglePickups: true
 
+deathItemLogging: true
+
 logMovement: true
 
 # in seconds
