@@ -7,6 +7,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -29,6 +30,7 @@ import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.morganm.activitytracker.ActivityTracker;
 import org.morganm.activitytracker.Log;
@@ -43,6 +45,8 @@ import org.morganm.activitytracker.util.PlayerUtil;
  *
  */
 public class MyPlayerListener implements Listener {
+	private final static HashSet<Integer> skipCommonItemsMap = new HashSet<Integer>(20);
+	
 	private final HashSet<Integer> leftClickRecord = new HashSet<Integer>(20);
 	private ActivityTracker plugin;
 	private TrackerManager trackerManager;
@@ -51,6 +55,29 @@ public class MyPlayerListener implements Listener {
 	private General util;
 	private HashMap<String, String> banReasons = new HashMap<String, String>(20);
 	private Log pickupDropLog;
+	
+	static {
+		skipCommonItemsMap.add(Material.DIRT.getId());
+		skipCommonItemsMap.add(Material.STONE.getId());
+		skipCommonItemsMap.add(Material.COBBLESTONE.getId());
+		skipCommonItemsMap.add(Material.GRAVEL.getId());
+		skipCommonItemsMap.add(Material.SAND.getId());
+		skipCommonItemsMap.add(Material.SANDSTONE.getId());
+		skipCommonItemsMap.add(Material.LEAVES.getId());
+		skipCommonItemsMap.add(Material.LOG.getId());
+		skipCommonItemsMap.add(Material.NETHERRACK.getId());
+		skipCommonItemsMap.add(Material.GLOWSTONE_DUST.getId());
+		skipCommonItemsMap.add(Material.SEEDS.getId());
+		skipCommonItemsMap.add(Material.WHEAT.getId());
+		skipCommonItemsMap.add(Material.REDSTONE.getId());
+		skipCommonItemsMap.add(Material.COAL.getId());
+		skipCommonItemsMap.add(Material.ROTTEN_FLESH.getId());
+		skipCommonItemsMap.add(Material.RED_MUSHROOM.getId());
+		skipCommonItemsMap.add(Material.BROWN_MUSHROOM.getId());
+		skipCommonItemsMap.add(Material.MELON.getId());
+		skipCommonItemsMap.add(Material.LONG_GRASS.getId());
+		skipCommonItemsMap.add(Material.CACTUS.getId());
+	}
 	
 	public MyPlayerListener(ActivityTracker plugin) {
 		this.plugin = plugin;
@@ -293,9 +320,17 @@ public class MyPlayerListener implements Listener {
 			if( pickupDropLog == null )
 				initPickupDropLog();
 			
-			pickupDropLog.logMessage("player " + event.getPlayer().getName()
-					+" picked up item "+event.getItem().getItemStack()+" at location "
-					+ util.shortLocationString(event.getPlayer().getLocation()));
+			boolean skipped = false;
+			if( plugin.getConfig().getBoolean("skipCommonSinglePickups", true) ) {
+				final ItemStack itemStack = event.getItem().getItemStack();
+				if( itemStack.getAmount() == 1 && skipCommonItemsMap.contains(itemStack.getTypeId()) )
+					skipped = true;
+			}
+			
+			if( !skipped )
+				pickupDropLog.logMessage("player " + event.getPlayer().getName()
+						+" picked up item "+event.getItem().getItemStack()+" at location "
+						+ util.shortLocationString(event.getPlayer().getLocation()));
 		}
 		
 		if( !trackerManager.isTracked(event.getPlayer()) )

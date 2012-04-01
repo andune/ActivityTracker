@@ -5,6 +5,10 @@ logDirPerGroup: false
 
 # log all inventory pickup/drop events to a central log?
 allPickupDropLogging: true
+# related to all pickup/drop logging: skip common single
+# pickups? This avoids the log being spammed with people
+# mining dirt, cobble, sand, etc
+skipCommonSinglePickups: true
 
 logMovement: true
 
