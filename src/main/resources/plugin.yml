@@ -1,8 +1,8 @@
-name: ActivityTracker
+name: ${project.name}
+url: ${project.url}
+version: ${project.version}
 main: org.morganm.activitytracker.ActivityTracker
-version: 0.5
-author: morganm
-softdepend: [LogBlock, Spout]
+softdepend: [LogBlock]
 commands:
   at:
     description: Admin control functions for ActivityTracker

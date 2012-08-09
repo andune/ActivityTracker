@@ -13,7 +13,7 @@ import org.morganm.activitytracker.ActivityTracker;
  *
  */
 public class BlockTracker {
-	private static final int BUFFER_MAX = 1000;
+	private static final int BUFFER_MAX = 30000;
 	
 //	private ActivityTracker plugin;
 	private BlockChange[] buffer = new BlockChange[BUFFER_MAX];
