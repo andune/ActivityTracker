@@ -161,7 +161,7 @@
 
               <relocations>
                 <relocation>
-                  <pattern>com.andune.minecraft</pattern>
+                  <pattern>com.andune.minecraft.commonlib</pattern>
                   <shadedPattern>${project.groupId}.shade</shadedPattern>
                 </relocation>
               </relocations>
