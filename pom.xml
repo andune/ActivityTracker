@@ -3,7 +3,7 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.morganm.activitytracker</groupId>
+  <groupId>com.andune.minecraft.activitytracker</groupId>
   <artifactId>ActivityTracker</artifactId>
   <version>0.6-SNAPSHOT</version>
   <name>ActivityTracker</name>
@@ -11,15 +11,15 @@
   <url>https://dev.bukkit.org/server-mods/ActivityTracker/</url>
 
   <scm>
-    <connection>scm:git:git://github.com/morganm/ActivityTracker.git</connection>
-    <url>https://github.com/morganm/ActivityTracker</url>
-    <developerConnection>scm:git:git@github.com:morganm/ActivityTracker.git</developerConnection>
+    <connection>scm:git:git://github.com/andune/ActivityTracker.git</connection>
+    <url>https://github.com/andune/ActivityTracker</url>
+    <developerConnection>scm:git:git@github.com:andune/ActivityTracker.git</developerConnection>
   </scm>
 
   <repositories>
     <repository>
-      <id>morganm-repo</id>
-      <url>http://morganmc.dyndns.org/nexus/content/groups/public/</url>
+      <id>andune-repo</id>
+      <url>http://morganmc.org/nexus/content/groups/public/</url>
     </repository>
     <repository>
       <id>bukkit-repo</id>

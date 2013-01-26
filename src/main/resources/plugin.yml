@@ -1,7 +1,7 @@
 name: ${project.name}
 url: ${project.url}
 version: ${project.version}
-main: org.morganm.activitytracker.ActivityTracker
+main: com.andune.minecraft.activitytracker.ActivityTracker
 softdepend: [LogBlock,WorldEdit,Vault]
 commands:
   at:

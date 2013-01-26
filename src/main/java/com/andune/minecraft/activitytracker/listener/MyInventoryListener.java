@@ -1,7 +1,34 @@
 /**
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Copyright (c) 2013 Andune (andune.alleria@gmail.com)
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ * notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer
+ * in the documentation and/or other materials provided with the
+ * distribution.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+/**
  * 
  */
-package org.morganm.activitytracker.listener;
+package com.andune.minecraft.activitytracker.listener;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,19 +43,19 @@ import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.ItemStack;
-import org.morganm.activitytracker.ActivityTracker;
-import org.morganm.activitytracker.Log;
-import org.morganm.activitytracker.LogManager;
-import org.morganm.activitytracker.TrackerManager;
-import org.morganm.activitytracker.block.BlockHistory;
-import org.morganm.activitytracker.block.BlockHistoryFactory;
-import org.morganm.activitytracker.block.BlockHistoryManager;
 
+import com.andune.minecraft.activitytracker.ActivityTracker;
+import com.andune.minecraft.activitytracker.Log;
+import com.andune.minecraft.activitytracker.LogManager;
+import com.andune.minecraft.activitytracker.TrackerManager;
+import com.andune.minecraft.activitytracker.block.BlockHistory;
+import com.andune.minecraft.activitytracker.block.BlockHistoryFactory;
+import com.andune.minecraft.activitytracker.block.BlockHistoryManager;
 import com.andune.minecraft.commonlib.GeneralBukkit;
 
 /** Code originally copied from @Diddiz's LogBlock plugin.
  * 
- * @author morganm, Diddiz (original Logblock code)
+ * @author andune, Diddiz (original Logblock code)
  *
  */
 public class MyInventoryListener implements Listener {
@@ -50,7 +77,7 @@ public class MyInventoryListener implements Listener {
 	/** When an inventory is closed, check to see if we had a "before" snapshot recorded
 	 * to compare against. If so, log the differences.
 	 * 
-	 * @author morganm, Diddiz (original LogBlock code)
+	 * @author andune, Diddiz (original LogBlock code)
 	 */
 	@EventHandler(priority=EventPriority.MONITOR)
 	public void onInventoryClose(InventoryCloseEvent event) {
@@ -93,12 +120,12 @@ public class MyInventoryListener implements Listener {
 	}
 
 	/** Record the "before" inventory of the container in memory when the chest is opened,
-	 * so that we can later compare before/after to see what has changed. -morganm
+	 * so that we can later compare before/after to see what has changed. -andune
 	 * 
 	 * Original Spout code ignored crafting events, hopefully since Bukkit has a separate
 	 * CraftItemEvent, that will happen automatically for us now.
 	 * 
-	 * @author morganm, Diddiz (original LogBlock code)
+	 * @author andune, Diddiz (original LogBlock code)
 	 */
 	@EventHandler(priority=EventPriority.MONITOR)
 	public void onInventoryOpen(InventoryOpenEvent event) {
@@ -114,7 +141,7 @@ public class MyInventoryListener implements Listener {
 	
 	/** Log crafting events as well.
 	 * 
-	 * @author morganm
+	 * @author andune
 	 */
 	@EventHandler(priority=EventPriority.MONITOR)
 	public void onInventoryCraft(CraftItemEvent event) {
