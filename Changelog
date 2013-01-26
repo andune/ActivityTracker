@@ -1,3 +1,7 @@
+v0.6 -
+* update to Bukkit 1.4.7-R0.1
+* update to common library dependency (includes bugfixes)
+
 v0.5 - March 11, 2012
 * R6 compatibility
 * no longer requires Spout for inventory event logging
