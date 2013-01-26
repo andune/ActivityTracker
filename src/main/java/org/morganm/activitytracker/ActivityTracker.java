@@ -4,6 +4,7 @@
 package org.morganm.activitytracker;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -12,15 +13,17 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitTask;
 import org.morganm.activitytracker.block.BlockLogger;
 import org.morganm.activitytracker.block.BlockTracker;
 import org.morganm.activitytracker.listener.MyBlockListener;
 import org.morganm.activitytracker.listener.MyEntityListener;
 import org.morganm.activitytracker.listener.MyInventoryListener;
 import org.morganm.activitytracker.listener.MyPlayerListener;
-import org.morganm.activitytracker.util.Debug;
-import org.morganm.activitytracker.util.JarUtils;
-import org.morganm.activitytracker.util.PermissionSystem;
+
+import com.andune.minecraft.commonlib.Debug;
+import com.andune.minecraft.commonlib.JarUtils;
+import com.andune.minecraft.commonlib.PermissionSystem;
 
 /**
  * @author morganm
@@ -36,6 +39,7 @@ public class ActivityTracker extends JavaPlugin {
 	
 	private PermissionSystem perm;
 	private JarUtils jarUtil;
+	private Debug debug;
 	
 	private TrackerManager trackerManager;
 	private LogManager logManager;
@@ -46,15 +50,17 @@ public class ActivityTracker extends JavaPlugin {
 	
 	@Override
 	public void onEnable() {
+	    debug = new Debug(this, this.getLogger());
+	    
 		version = getDescription().getVersion();
-		jarUtil = new JarUtils(this, getFile(), log, logPrefix);
+		jarUtil = new JarUtils(getDataFolder(), getFile());
 		buildNumber = jarUtil.getBuildNumber();
 		
 		loadConfig();
 		
 //		System.out.println("bukkit version = "+Bukkit.getBukkitVersion());
 		
-		perm = new PermissionSystem(this, log, logPrefix);
+		perm = new PermissionSystem(this, log);
 		perm.setupPermissions();
 		
 		trackerManager = new TrackerManager(this);
@@ -74,7 +80,7 @@ public class ActivityTracker extends JavaPlugin {
 //		}
 		
 		blockLogger = new BlockLogger(this);
-		getServer().getScheduler().scheduleAsyncRepeatingTask(this, blockLogger, 100, 100);		// every 5 seconds
+		getServer().getScheduler().runTaskTimerAsynchronously(this, blockLogger, 100, 100);       // every 5 seconds
 		
 		postConfig();
 		
@@ -105,7 +111,12 @@ public class ActivityTracker extends JavaPlugin {
 	public void loadConfig() {
 		File file = new File(getDataFolder(), "config.yml");
 		if( !file.exists() ) {
-			jarUtil.copyConfigFromJar("config.yml", file);
+		    try {
+		        jarUtil.copyConfigFromJar("config.yml", file);
+		    }
+		    catch(IOException e) {
+		        log.log(Level.WARNING, e.getMessage(), e);
+		    }
 		}
 		
 		if( !configLoaded ) {
@@ -115,9 +126,8 @@ public class ActivityTracker extends JavaPlugin {
 		else
 			super.reloadConfig();
 		
-		Debug.getInstance().init(log, logPrefix, false);
-		Debug.getInstance().setDebug(getConfig().getBoolean("devDebug", false), Level.FINEST);
-		Debug.getInstance().setDebug(getConfig().getBoolean("debug", false));
+		debug.setDebug(getConfig().getBoolean("devDebug", false), Level.FINEST);
+		debug.setDebug(getConfig().getBoolean("debug", false));
 	}
 	
 	public void liveReloadConfig() {
@@ -136,8 +146,8 @@ public class ActivityTracker extends JavaPlugin {
 			int seconds = getConfig().getInt("logMovementInterval");
 			if( movementTracker == null )
 				movementTracker = new MovementTracker(this);
-			int taskId = getServer().getScheduler().scheduleAsyncRepeatingTask(this, movementTracker, seconds*20, seconds*20);
-			movementTracker.setTaskId(taskId);
+			BukkitTask task = getServer().getScheduler().runTaskTimerAsynchronously(this, movementTracker, seconds*20, seconds*20);
+			movementTracker.setTaskId(task.getTaskId());
 		}
 	}
 	
@@ -148,6 +158,8 @@ public class ActivityTracker extends JavaPlugin {
 	public boolean isDeathItemLogEnabled() {
 		return getConfig().getBoolean("deathItemLogging", false);
 	}
+	
+	public Debug getDebug() { return debug; }
 	
 	public TrackerManager getTrackerManager() { return trackerManager; }
 	public LogManager getLogManager() { return logManager; }

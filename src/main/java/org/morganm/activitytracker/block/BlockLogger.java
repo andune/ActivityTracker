@@ -9,7 +9,8 @@ import org.bukkit.Location;
 import org.morganm.activitytracker.ActivityTracker;
 import org.morganm.activitytracker.Log;
 import org.morganm.activitytracker.LogManager;
-import org.morganm.activitytracker.util.Debug;
+
+import com.andune.minecraft.commonlib.Debug;
 
 /**
  * @author morganm
@@ -33,7 +34,7 @@ public class BlockLogger implements Runnable {
 		this.logManager = this.plugin.getLogManager();
 		this.blockHistoryManager = BlockHistoryFactory.getBlockHistoryManager(plugin);
 		this.blockHistoryCache = BlockHistoryFactory.getBlockHistoryCache();
-		this.debug = Debug.getInstance();
+		this.debug = plugin.getDebug();
 	}
 	
 	public void cancel() {

@@ -32,35 +32,19 @@
     <dependency>
       <groupId>org.bukkit</groupId>
       <artifactId>bukkit</artifactId>
-      <version>1.3.1-R1.0</version>
+      <version>1.4.6-R0.3</version>
     </dependency>
 
-    <!-- PermissionSystem dependencies -->
+    <!-- Common Library -->
     <dependency>
-      <groupId>com.nijiko</groupId>
-      <artifactId>permissions</artifactId>
-      <version>2.7</version>
+      <groupId>com.andune.minecraft.commonlib</groupId>
+      <artifactId>commonlib</artifactId>
+      <version>0.4-SNAPSHOT</version>
     </dependency>
     <dependency>
-      <groupId>ru.tehkode</groupId>
-      <artifactId>PermissionsEx</artifactId>
-      <version>1.19.1</version>
-    </dependency>
-    <dependency>
-      <groupId>com.sk89q</groupId>
-      <artifactId>worldedit</artifactId>
-      <version>5.3</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.spout</groupId>
-          <artifactId>spoutapi</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>net.milkbowl.vault</groupId>
-      <artifactId>Vault</artifactId>
-      <version>1.2.15</version>
+      <groupId>com.andune.minecraft.commonlib</groupId>
+      <artifactId>commonBukkitlib</artifactId>
+      <version>0.4-SNAPSHOT</version>
     </dependency>
 
     <!-- LogBlock -->
@@ -100,6 +84,21 @@
 
     <!-- Plugins -->
     <plugins>
+      <!-- License check; run 'mvn license:check' or 'mvn license:format' -->
+      <plugin>
+        <groupId>com.mycila.maven-license-plugin</groupId>
+        <artifactId>maven-license-plugin</artifactId>
+        <configuration>
+          <header>src/main/license/header.txt</header>
+          <strictCheck>true</strictCheck>
+          <excludes>
+            <exclude>**/src/main/resources/**</exclude>
+            <exclude>**/src/main/assembly/**</exclude>
+            <exclude>**/src/main/license/**</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-antrun-plugin</artifactId>
@@ -131,6 +130,44 @@
           <target>1.6</target>
           <compilerVersion>1.6</compilerVersion>
         </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>1.7.1</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <artifactSet>
+                <includes>
+                  <include>com.andune.minecraft.commonlib:commonlib</include>
+                  <include>com.andune.minecraft.commonlib:commonBukkitlib</include>
+                </includes>
+              </artifactSet>
+
+              <filters>
+                <filter>
+                  <artifact>com.andune.minecraft.commonlib:commonlib</artifact>
+                  <excludes>
+                    <exclude>com/andune/minecraft/commonlib/i18n/**</exclude>
+                  </excludes>
+                </filter>
+              </filters>
+
+              <relocations>
+                <relocation>
+                  <pattern>com.andune.minecraft</pattern>
+                  <shadedPattern>${project.groupId}.shade</shadedPattern>
+                </relocation>
+              </relocations>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
 
 <!--

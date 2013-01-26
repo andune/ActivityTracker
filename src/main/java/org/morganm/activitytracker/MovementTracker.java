@@ -10,8 +10,9 @@ import java.util.Set;
 import org.bukkit.Location;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
-import org.morganm.activitytracker.util.Debug;
-import org.morganm.activitytracker.util.General;
+
+import com.andune.minecraft.commonlib.Debug;
+import com.andune.minecraft.commonlib.GeneralBukkit;
 
 /** Rather than hooking the expensive PLAYER_MOVE and forcing the Bukkit overhead associated with
  * producing and processing those events on every PLAYER_MOVE, we instead schedule a process to
@@ -27,7 +28,7 @@ public class MovementTracker implements Runnable {
 	private final LogManager logManager;
 	private final HashMap<HumanEntity,Location> positions = new HashMap<HumanEntity,Location>(10);
 	private final Debug debug;
-	private final General util;
+	private final GeneralBukkit util;
 	private final TrackerManager trackerMgr;
 	private int taskId;
 	
@@ -37,9 +38,9 @@ public class MovementTracker implements Runnable {
 		this.plugin = plugin;
 		this.trackerMgr = this.plugin.getTrackerManager();
 		this.logManager = this.plugin.getLogManager();
-		this.debug = Debug.getInstance();
-		this.util = General.getInstance();
-		Debug.getInstance().debug("MovementTracker constructur: trackerMgr=",trackerMgr);
+		this.debug = plugin.getDebug();
+		this.util = new GeneralBukkit();
+		debug.debug("MovementTracker constructur: trackerMgr=",trackerMgr);
 }
 	
 	public void setTaskId(int id) { this.taskId = id; }

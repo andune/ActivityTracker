@@ -12,7 +12,7 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.logging.Logger;
 
-import org.morganm.activitytracker.util.PermissionSystem;
+import com.andune.minecraft.commonlib.PermissionSystem;
 
 /** Class that actually handles the logging activity.
  * 
@@ -28,6 +28,7 @@ public class Log {
 	
 	private final ActivityTracker plugin;
 	private final String playerName;
+	private final PermissionSystem perm;
 	private String logDir;
 	private boolean logDirPerGroup = false; 
 	private File file;
@@ -38,12 +39,14 @@ public class Log {
 	public Log(ActivityTracker plugin, String playerName) {
 		this.plugin = plugin;
 		this.playerName = playerName;
+		this.perm = plugin.getPerm();
 		loadConfig();
 	}
 	public Log(ActivityTracker plugin, File logFile) {
 		this.plugin = plugin;
 		this.playerName = null;
 		this.file = logFile;
+        this.perm = plugin.getPerm();
 		loadConfig();
 	}
 	
@@ -63,7 +66,7 @@ public class Log {
 		
 		File fLogDir = null;
 		if( file == null && logDirPerGroup ) {
-			String group = PermissionSystem.getInstance().getPlayerGroup(null, playerName);
+			String group = perm.getPlayerGroup(null, playerName);
 			if( group != null ) {
 				fLogDir = new File(logDir + "/" + group);
 				file = new File(logDir+"/"+group+"/"+playerName+".log");

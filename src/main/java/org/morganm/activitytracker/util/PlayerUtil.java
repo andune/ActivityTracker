@@ -11,20 +11,6 @@ import java.io.File;
  *
  */
 public class PlayerUtil {
-	private static PlayerUtil instance;
-	
-	private PlayerUtil() {}
-	
-	/** Singleton pattern.
-	 * 
-	 * @return
-	 */
-	public static PlayerUtil getInstance() {
-		if( instance == null )
-			instance = new PlayerUtil();
-		return instance;
-	}
-	
     public boolean isNewPlayer(String playerName) {
     	boolean newPlayerFlag = true;
     	
@@ -34,7 +20,7 @@ public class PlayerUtil {
     	if( file.exists() )
     		newPlayerFlag = false;
     	
-    	Debug.getInstance().debug("isNewPlayer() playerName=",playerName,", result=",newPlayerFlag);
+//    	Debug.getInstance().debug("isNewPlayer() playerName=",playerName,", result=",newPlayerFlag);
     	
     	// if we didn't find any record of this player on any world, they must be new
     	return newPlayerFlag;

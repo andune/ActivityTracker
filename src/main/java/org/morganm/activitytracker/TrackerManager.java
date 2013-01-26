@@ -8,8 +8,9 @@ import java.util.List;
 import java.util.Set;
 
 import org.bukkit.entity.HumanEntity;
-import org.morganm.activitytracker.util.Debug;
-import org.morganm.activitytracker.util.PermissionSystem;
+
+import com.andune.minecraft.commonlib.Debug;
+import com.andune.minecraft.commonlib.PermissionSystem;
 
 /** Class to keep track of which players are being tracked.
  * 
@@ -27,7 +28,7 @@ public class TrackerManager {
 		this.plugin = plugin;
 		this.permHandler = this.plugin.getPerm();
 		loadConfig();
-		debug = Debug.getInstance();
+		debug = plugin.getDebug();
 	}
 	
 	public void loadConfig() {

@@ -4,7 +4,7 @@
 package org.morganm.activitytracker.block;
 
 import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.morganm.activitytracker.ActivityTracker;
 
 /**
  * @author morganm
@@ -13,7 +13,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class BlockHistoryFactory {
 	private static final BlockHistoryCache cache = new BlockHistoryCache();
 	
-	public static BlockHistoryManager getBlockHistoryManager(final JavaPlugin plugin) {
+	public static BlockHistoryManager getBlockHistoryManager(final ActivityTracker plugin) {
 		Plugin p = plugin.getServer().getPluginManager().getPlugin("LogBlock");
 		if( p != null )
 			return new BlockHistoryLogBlock(plugin, cache);

@@ -10,7 +10,8 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
-import org.morganm.activitytracker.util.PermissionSystem;
+
+import com.andune.minecraft.commonlib.PermissionSystem;
 
 /** Class for processing commands.
  * 
@@ -23,7 +24,7 @@ public class Commands {
 	
 	public Commands(ActivityTracker plugin) {
 		this.plugin = plugin;
-		this.perms = PermissionSystem.getInstance();
+		this.perms = plugin.getPerm();
 	}
 	
 	public boolean onCommand(CommandSender sender, Command command,

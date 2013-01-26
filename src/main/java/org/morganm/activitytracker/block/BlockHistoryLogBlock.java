@@ -6,7 +6,9 @@ package org.morganm.activitytracker.block;
 import org.bukkit.Location;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.morganm.activitytracker.util.Debug;
+import org.morganm.activitytracker.ActivityTracker;
+
+import com.andune.minecraft.commonlib.Debug;
 
 import de.diddiz.LogBlock.LogBlock;
 import de.diddiz.LogBlock.QueryParams;
@@ -22,9 +24,9 @@ public class BlockHistoryLogBlock implements BlockHistoryManager {
 	private final Debug debug;
 	private final BlockHistoryCache bhCache;
 	
-	public BlockHistoryLogBlock(final JavaPlugin plugin, final BlockHistoryCache bhCache) {
+	public BlockHistoryLogBlock(final ActivityTracker plugin, final BlockHistoryCache bhCache) {
 		this.plugin = plugin;
-		this.debug = Debug.getInstance();
+		this.debug = plugin.getDebug();
 		this.bhCache = bhCache;
 		
 		Plugin p = this.plugin.getServer().getPluginManager().getPlugin("LogBlock");

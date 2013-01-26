@@ -36,9 +36,10 @@ import org.morganm.activitytracker.ActivityTracker;
 import org.morganm.activitytracker.Log;
 import org.morganm.activitytracker.LogManager;
 import org.morganm.activitytracker.TrackerManager;
-import org.morganm.activitytracker.util.Debug;
-import org.morganm.activitytracker.util.General;
 import org.morganm.activitytracker.util.PlayerUtil;
+
+import com.andune.minecraft.commonlib.Debug;
+import com.andune.minecraft.commonlib.GeneralBukkit;
 
 /**
  * @author morganm
@@ -48,12 +49,13 @@ public class MyPlayerListener implements Listener {
 	private final static HashSet<Integer> skipCommonItemsMap = new HashSet<Integer>(20);
 	
 	private final HashSet<Integer> leftClickRecord = new HashSet<Integer>(20);
-	private ActivityTracker plugin;
-	private TrackerManager trackerManager;
-	private LogManager logManager;
-	private Debug debug;
-	private General util;
-	private HashMap<String, String> banReasons = new HashMap<String, String>(20);
+	private final PlayerUtil playerUtil;
+	private final ActivityTracker plugin;
+	private final TrackerManager trackerManager;
+	private final LogManager logManager;
+	private final Debug debug;
+	private final GeneralBukkit util;
+	private final HashMap<String, String> banReasons = new HashMap<String, String>(20);
 	private Log pickupDropLog;
 	
 	static {
@@ -83,8 +85,9 @@ public class MyPlayerListener implements Listener {
 		this.plugin = plugin;
 		this.trackerManager = this.plugin.getTrackerManager();
 		this.logManager = this.plugin.getLogManager();
-		this.debug = Debug.getInstance();
-		this.util = General.getInstance();
+		this.debug = plugin.getDebug();
+		this.util = new GeneralBukkit();
+		this.playerUtil = new PlayerUtil();
 		
 		initializeLeftClickRecordMap();
 	}
@@ -104,7 +107,7 @@ public class MyPlayerListener implements Listener {
 		if( !trackerManager.isTracked(event.getPlayer()) )
 			return;
 		
-		boolean newPlayer = PlayerUtil.getInstance().isNewPlayer(playerName);
+		boolean newPlayer = playerUtil.isNewPlayer(playerName);
 		Log log = logManager.getLog(playerName);
 		log.logMessage("player logged in" + (newPlayer ? " (NEW PLAYER)" : ""));
 	}

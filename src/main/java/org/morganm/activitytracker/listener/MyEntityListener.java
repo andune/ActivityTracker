@@ -19,7 +19,8 @@ import org.morganm.activitytracker.ActivityTracker;
 import org.morganm.activitytracker.Log;
 import org.morganm.activitytracker.LogManager;
 import org.morganm.activitytracker.TrackerManager;
-import org.morganm.activitytracker.util.General;
+
+import com.andune.minecraft.commonlib.GeneralBukkit;
 
 /**
  * @author morganm
@@ -29,14 +30,14 @@ public class MyEntityListener implements Listener {
 	private final ActivityTracker plugin;
 	private final TrackerManager trackerManager;
 	private final LogManager logManager;
-	private final General util;
+	private final GeneralBukkit util;
 	private Log deathItemLog;
 	
 	public MyEntityListener(ActivityTracker plugin) {
 		this.plugin = plugin;
 		this.trackerManager = this.plugin.getTrackerManager();
 		this.logManager = this.plugin.getLogManager();
-		this.util = General.getInstance();
+		this.util = new GeneralBukkit();
 	}
 
 	@EventHandler(priority=EventPriority.MONITOR)

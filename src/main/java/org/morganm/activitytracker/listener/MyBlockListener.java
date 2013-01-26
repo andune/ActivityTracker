@@ -17,7 +17,8 @@ import org.morganm.activitytracker.ActivityTracker;
 import org.morganm.activitytracker.TrackerManager;
 import org.morganm.activitytracker.block.BlockChange;
 import org.morganm.activitytracker.block.BlockTracker;
-import org.morganm.activitytracker.util.Debug;
+
+import com.andune.minecraft.commonlib.Debug;
 
 /**
  * @author morganm
@@ -33,7 +34,7 @@ public class MyBlockListener implements Listener {
 		this.plugin = plugin;
 		this.trackerManager = this.plugin.getTrackerManager();
 		this.tracker = this.plugin.getBlockTracker();
-		this.debug = Debug.getInstance();
+		this.debug = plugin.getDebug();
 	}
 	
 	@EventHandler(priority=EventPriority.MONITOR)

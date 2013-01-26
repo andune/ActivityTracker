@@ -23,7 +23,8 @@ import org.morganm.activitytracker.TrackerManager;
 import org.morganm.activitytracker.block.BlockHistory;
 import org.morganm.activitytracker.block.BlockHistoryFactory;
 import org.morganm.activitytracker.block.BlockHistoryManager;
-import org.morganm.activitytracker.util.General;
+
+import com.andune.minecraft.commonlib.GeneralBukkit;
 
 /** Code originally copied from @Diddiz's LogBlock plugin.
  * 
@@ -34,7 +35,7 @@ public class MyInventoryListener implements Listener {
 	private final ActivityTracker plugin;
 	private final TrackerManager trackerManager;
 	private final LogManager logManager;
-	private final General util;
+	private final GeneralBukkit util;
 	private BlockHistoryManager blockHistoryManager;
 	private final Map<Player, ItemStack[]> containers = new HashMap<Player, ItemStack[]>();
 
@@ -43,7 +44,7 @@ public class MyInventoryListener implements Listener {
 		this.trackerManager = this.plugin.getTrackerManager();
 		this.logManager = this.plugin.getLogManager();
 		this.blockHistoryManager = BlockHistoryFactory.getBlockHistoryManager(plugin);
-		this.util = General.getInstance();
+		this.util = new GeneralBukkit();
 	}
 
 	/** When an inventory is closed, check to see if we had a "before" snapshot recorded

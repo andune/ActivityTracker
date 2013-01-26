@@ -2,7 +2,7 @@ name: ${project.name}
 url: ${project.url}
 version: ${project.version}
 main: org.morganm.activitytracker.ActivityTracker
-softdepend: [LogBlock]
+softdepend: [LogBlock,WorldEdit,Vault]
 commands:
   at:
     description: Admin control functions for ActivityTracker
