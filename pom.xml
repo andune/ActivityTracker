@@ -39,12 +39,12 @@
     <dependency>
       <groupId>com.andune.minecraft.commonlib</groupId>
       <artifactId>commonlib</artifactId>
-      <version>0.4-SNAPSHOT</version>
+      <version>0.4</version>
     </dependency>
     <dependency>
       <groupId>com.andune.minecraft.commonlib</groupId>
       <artifactId>commonBukkitlib</artifactId>
-      <version>0.4-SNAPSHOT</version>
+      <version>0.4</version>
     </dependency>
 
     <!-- LogBlock -->
